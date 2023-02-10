@@ -69,20 +69,20 @@ public abstract class StatusListFragment extends BaseStatusListFragment<Status>{
 		ArrayList<Status> statusesForDisplayItems=new ArrayList<>();
 		for(int i=0;i<data.size();i++){
 			Status s=data.get(i);
-			if(s.reblog!=null && s.reblog.id.equals(ev.status.id)){
-				s.reblog=ev.status;
+			if(s.reblog!=null && s.reblog.id.equals(ev.getStatus().id)){
+				s.reblog=ev.getStatus();
 				statusesForDisplayItems.add(s);
-			}else if(s.id.equals(ev.status.id)){
-				data.set(i, ev.status);
-				statusesForDisplayItems.add(ev.status);
+			}else if(s.id.equals(ev.getStatus().id)){
+				data.set(i, ev.getStatus());
+				statusesForDisplayItems.add(ev.getStatus());
 			}
 		}
 		for(int i=0;i<preloadedData.size();i++){
 			Status s=preloadedData.get(i);
-			if(s.reblog!=null && s.reblog.id.equals(ev.status.id)){
-				s.reblog=ev.status;
-			}else if(s.id.equals(ev.status.id)){
-				preloadedData.set(i, ev.status);
+			if(s.reblog!=null && s.reblog.id.equals(ev.getStatus().id)){
+				s.reblog=ev.getStatus();
+			}else if(s.id.equals(ev.getStatus().id)){
+				preloadedData.set(i, ev.getStatus());
 			}
 		}
 
@@ -143,7 +143,7 @@ public abstract class StatusListFragment extends BaseStatusListFragment<Status>{
 
 	protected void onRemoveAccountPostsEvent(RemoveAccountPostsEvent ev){
 		List<Status> toRemove=Stream.concat(data.stream(), preloadedData.stream())
-				.filter(s->s.account.id.equals(ev.postsByAccountID) || (s.reblog!=null && s.reblog.account.id.equals(ev.postsByAccountID)))
+				.filter(s->s.account.id.equals(ev.getPostsByAccountID()) || (s.reblog!=null && s.reblog.account.id.equals(ev.getPostsByAccountID())))
 				.collect(Collectors.toList());
 		for(Status s:toRemove){
 			removeStatus(s);
@@ -197,9 +197,9 @@ public abstract class StatusListFragment extends BaseStatusListFragment<Status>{
 
 		@Subscribe
 		public void onStatusDeleted(StatusDeletedEvent ev){
-			if(!ev.accountID.equals(accountID))
+			if(!ev.getAccountID().equals(accountID))
 				return;
-			Status status=getStatusByID(ev.id);
+			Status status=getStatusByID(ev.getId());
 			if(status==null)
 				return;
 			removeStatus(status);
@@ -207,7 +207,7 @@ public abstract class StatusListFragment extends BaseStatusListFragment<Status>{
 
 		@Subscribe
 		public void onStatusCreated(StatusCreatedEvent ev){
-			if(!ev.accountID.equals(accountID))
+			if(!ev.getAccountID().equals(accountID))
 				return;
 			StatusListFragment.this.onStatusCreated(ev);
 		}
@@ -219,21 +219,21 @@ public abstract class StatusListFragment extends BaseStatusListFragment<Status>{
 
 		@Subscribe
 		public void onPollUpdated(PollUpdatedEvent ev){
-			if(!ev.accountID.equals(accountID))
+			if(!ev.getAccountID().equals(accountID))
 				return;
 			for(Status status:data){
 				Status contentStatus=status.getContentStatus();
-				if(contentStatus.poll!=null && contentStatus.poll.id.equals(ev.poll.id)){
-					updatePoll(status.id, status, ev.poll);
+				if(contentStatus.poll!=null && contentStatus.poll.id.equals(ev.getPoll().id)){
+					updatePoll(status.id, status, ev.getPoll());
 				}
 			}
 		}
 
 		@Subscribe
 		public void onRemoveAccountPostsEvent(RemoveAccountPostsEvent ev){
-			if(!ev.accountID.equals(accountID))
+			if(!ev.getAccountID().equals(accountID))
 				return;
-			if(ev.isUnfollow && !shouldRemoveAccountPostsWhenUnfollowing())
+			if(ev.isUnfollow() && !shouldRemoveAccountPostsWhenUnfollowing())
 				return;
 			StatusListFragment.this.onRemoveAccountPostsEvent(ev);
 		}

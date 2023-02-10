@@ -75,17 +75,17 @@ public class AccountTimelineFragment extends StatusListFragment{
 	}
 
 	protected void onStatusCreated(StatusCreatedEvent ev){
-		if(!AccountSessionManager.getInstance().isSelf(accountID, ev.status.account))
+		if(!AccountSessionManager.getInstance().isSelf(accountID, ev.getStatus().account))
 			return;
 		if(filter==GetAccountStatuses.Filter.DEFAULT){
 			// Keep replies to self, discard all other replies
-			if(ev.status.inReplyToAccountId!=null && !ev.status.inReplyToAccountId.equals(AccountSessionManager.getInstance().getAccount(accountID).self.id))
+			if(ev.getStatus().inReplyToAccountId!=null && !ev.getStatus().inReplyToAccountId.equals(AccountSessionManager.getInstance().getAccount(accountID).self.id))
 				return;
 		}else if(filter==GetAccountStatuses.Filter.MEDIA){
-			if(ev.status.mediaAttachments.isEmpty())
+			if(ev.getStatus().mediaAttachments.isEmpty())
 				return;
 		}
-		prependItems(Collections.singletonList(ev.status), true);
+		prependItems(Collections.singletonList(ev.getStatus()), true);
 	}
 
 	@Override

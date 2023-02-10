@@ -123,8 +123,8 @@ public class ThreadFragment extends StatusListFragment{
 	}
 
 	protected void onStatusCreated(StatusCreatedEvent ev){
-		if(ev.status.inReplyToId!=null && getStatusByID(ev.status.inReplyToId)!=null){
-			onAppendItems(Collections.singletonList(ev.status));
+		if(ev.getStatus().inReplyToId!=null && getStatusByID(ev.getStatus().inReplyToId)!=null){
+			onAppendItems(Collections.singletonList(ev.getStatus()));
 		}
 	}
 
