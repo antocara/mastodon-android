@@ -39,7 +39,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
-import org.joinmastodon.android.GlobalUserPreferences;
+import org.joinmastodon.android.data.GlobalUserPreferences;
 import org.joinmastodon.android.R;
 import org.joinmastodon.android.api.requests.accounts.GetAccountByID;
 import org.joinmastodon.android.api.requests.accounts.GetAccountRelationships;
@@ -48,6 +48,7 @@ import org.joinmastodon.android.api.requests.accounts.GetOwnAccount;
 import org.joinmastodon.android.api.requests.accounts.SetAccountFollowed;
 import org.joinmastodon.android.api.requests.accounts.UpdateAccountCredentials;
 import org.joinmastodon.android.api.session.AccountSessionManager;
+import org.joinmastodon.android.data.GlobalUserPreferencesDataSource;
 import org.joinmastodon.android.fragments.account_list.FollowerListFragment;
 import org.joinmastodon.android.fragments.account_list.FollowingListFragment;
 import org.joinmastodon.android.fragments.report.ReportReasonChoiceFragment;
@@ -132,6 +133,8 @@ public class ProfileFragment extends LoaderFragment implements OnBackPressedList
 	private WindowInsets childInsets;
 	private PhotoViewer currentPhotoViewer;
 	private boolean editModeLoading;
+
+	private GlobalUserPreferencesDataSource globalUserPreferencesDataSource = new GlobalUserPreferences();
 
 	public ProfileFragment(){
 		super(R.layout.loader_fragment_overlay_toolbar);
@@ -424,8 +427,8 @@ public class ProfileFragment extends LoaderFragment implements OnBackPressedList
 	private void bindHeaderView(){
 		setTitle(account.displayName);
 		setSubtitle(getResources().getQuantityString(R.plurals.x_posts, (int)(account.statusesCount%1000), account.statusesCount));
-		ViewImageLoader.load(avatar, null, new UrlImageLoaderRequest(GlobalUserPreferences.playGifs ? account.avatar : account.avatarStatic, V.dp(100), V.dp(100)));
-		ViewImageLoader.load(cover, null, new UrlImageLoaderRequest(GlobalUserPreferences.playGifs ? account.header : account.headerStatic, 1000, 1000));
+		ViewImageLoader.load(avatar, null, new UrlImageLoaderRequest(globalUserPreferencesDataSource.getPlayGifs() ? account.avatar : account.avatarStatic, V.dp(100), V.dp(100)));
+		ViewImageLoader.load(cover, null, new UrlImageLoaderRequest(globalUserPreferencesDataSource.getPlayGifs() ? account.header : account.headerStatic, 1000, 1000));
 		SpannableStringBuilder ssb=new SpannableStringBuilder(account.displayName);
 		HtmlParser.parseCustomEmoji(ssb, account.emojis);
 		name.setText(ssb);

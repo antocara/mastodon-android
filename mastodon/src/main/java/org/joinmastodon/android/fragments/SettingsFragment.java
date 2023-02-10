@@ -30,7 +30,7 @@ import com.squareup.otto.Subscribe;
 
 import org.joinmastodon.android.BuildConfig;
 import org.joinmastodon.android.E;
-import org.joinmastodon.android.GlobalUserPreferences;
+import org.joinmastodon.android.data.GlobalUserPreferences;
 import org.joinmastodon.android.MainActivity;
 import org.joinmastodon.android.MastodonApp;
 import org.joinmastodon.android.R;
@@ -40,6 +40,8 @@ import org.joinmastodon.android.api.requests.oauth.RevokeOauthToken;
 import org.joinmastodon.android.api.session.AccountActivationInfo;
 import org.joinmastodon.android.api.session.AccountSession;
 import org.joinmastodon.android.api.session.AccountSessionManager;
+import org.joinmastodon.android.data.GlobalUserPreferencesDataSource;
+import org.joinmastodon.android.data.ThemePreference;
 import org.joinmastodon.android.events.SelfUpdateStateChangedEvent;
 import org.joinmastodon.android.fragments.onboarding.AccountActivationFragment;
 import org.joinmastodon.android.model.PushNotification;
@@ -76,9 +78,12 @@ public class SettingsFragment extends MastodonToolbarFragment{
 
 	private ImageView themeTransitionWindowView;
 
+	private GlobalUserPreferencesDataSource globalUserPreferencesDataSource;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
+		this.globalUserPreferencesDataSource = new GlobalUserPreferences();
 		if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.N)
 			setRetainInstance(true);
 		setTitle(R.string.settings);
@@ -95,16 +100,15 @@ public class SettingsFragment extends MastodonToolbarFragment{
 
 		items.add(new HeaderItem(R.string.settings_theme));
 		items.add(themeItem=new ThemeItem());
-		items.add(new SwitchItem(R.string.theme_true_black, R.drawable.ic_fluent_dark_theme_24_regular, GlobalUserPreferences.trueBlackTheme, this::onTrueBlackThemeChanged));
+		items.add(new SwitchItem(R.string.theme_true_black, R.drawable.ic_fluent_dark_theme_24_regular, globalUserPreferencesDataSource.getTrueBlackTheme(), this::onTrueBlackThemeChanged));
 
 		items.add(new HeaderItem(R.string.settings_behavior));
-		items.add(new SwitchItem(R.string.settings_gif, R.drawable.ic_fluent_gif_24_regular, GlobalUserPreferences.playGifs, i->{
-			GlobalUserPreferences.playGifs=i.checked;
-			GlobalUserPreferences.save();
+		items.add(new SwitchItem(R.string.settings_gif, R.drawable.ic_fluent_gif_24_regular, globalUserPreferencesDataSource.getPlayGifs(), i->{
+			globalUserPreferencesDataSource.setPlayGifs(i.checked);
 		}));
-		items.add(new SwitchItem(R.string.settings_custom_tabs, R.drawable.ic_fluent_link_24_regular, GlobalUserPreferences.useCustomTabs, i->{
-			GlobalUserPreferences.useCustomTabs=i.checked;
-			GlobalUserPreferences.save();
+		items.add(new SwitchItem(R.string.settings_custom_tabs, R.drawable.ic_fluent_link_24_regular, globalUserPreferencesDataSource.getUseCustomTabs(), i->{
+			globalUserPreferencesDataSource.setUseCustomTabs(i.checked);
+
 		}));
 
 		items.add(new HeaderItem(R.string.settings_notifications));
@@ -202,15 +206,13 @@ public class SettingsFragment extends MastodonToolbarFragment{
 			E.unregister(this);
 	}
 
-	private void onThemePreferenceClick(GlobalUserPreferences.ThemePreference theme){
-		GlobalUserPreferences.theme=theme;
-		GlobalUserPreferences.save();
+	private void onThemePreferenceClick(ThemePreference theme){
+		globalUserPreferencesDataSource.setTheme(theme);
 		restartActivityToApplyNewTheme();
 	}
 
 	private void onTrueBlackThemeChanged(SwitchItem item){
-		GlobalUserPreferences.trueBlackTheme=item.checked;
-		GlobalUserPreferences.save();
+		globalUserPreferencesDataSource.setTrueBlackTheme(item.checked);
 
 		RecyclerView.ViewHolder themeHolder=list.findViewHolderForAdapterPosition(items.indexOf(themeItem));
 		if(themeHolder!=null){
@@ -571,19 +573,19 @@ public class SettingsFragment extends MastodonToolbarFragment{
 		}
 
 		public void bindSubitems(){
-			autoHolder.bind(R.string.theme_auto, GlobalUserPreferences.trueBlackTheme ? R.drawable.theme_auto_trueblack : R.drawable.theme_auto, GlobalUserPreferences.theme==GlobalUserPreferences.ThemePreference.AUTO);
-			lightHolder.bind(R.string.theme_light, R.drawable.theme_light, GlobalUserPreferences.theme==GlobalUserPreferences.ThemePreference.LIGHT);
-			darkHolder.bind(R.string.theme_dark, GlobalUserPreferences.trueBlackTheme ? R.drawable.theme_dark_trueblack : R.drawable.theme_dark, GlobalUserPreferences.theme==GlobalUserPreferences.ThemePreference.DARK);
+			autoHolder.bind(R.string.theme_auto, globalUserPreferencesDataSource.getTrueBlackTheme() ? R.drawable.theme_auto_trueblack : R.drawable.theme_auto, globalUserPreferencesDataSource.getTheme()==ThemePreference.AUTO);
+			lightHolder.bind(R.string.theme_light, R.drawable.theme_light, globalUserPreferencesDataSource.getTheme()==ThemePreference.LIGHT);
+			darkHolder.bind(R.string.theme_dark, globalUserPreferencesDataSource.getTrueBlackTheme() ? R.drawable.theme_dark_trueblack : R.drawable.theme_dark, globalUserPreferencesDataSource.getTheme()==ThemePreference.DARK);
 		}
 
 		private void onSubitemClick(View v){
-			GlobalUserPreferences.ThemePreference pref;
+			ThemePreference pref;
 			if(v.getId()==R.id.theme_auto)
-				pref=GlobalUserPreferences.ThemePreference.AUTO;
+				pref=ThemePreference.AUTO;
 			else if(v.getId()==R.id.theme_light)
-				pref=GlobalUserPreferences.ThemePreference.LIGHT;
+				pref=ThemePreference.LIGHT;
 			else if(v.getId()==R.id.theme_dark)
-				pref=GlobalUserPreferences.ThemePreference.DARK;
+				pref=ThemePreference.DARK;
 			else
 				return;
 			onThemePreferenceClick(pref);

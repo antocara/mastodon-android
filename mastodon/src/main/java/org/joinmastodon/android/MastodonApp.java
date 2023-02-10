@@ -5,8 +5,7 @@ import android.app.Application;
 import android.content.Context;
 
 import org.joinmastodon.android.api.PushSubscriptionManager;
-
-import java.lang.reflect.InvocationTargetException;
+import org.joinmastodon.android.data.GlobalUserPreferences;
 
 import me.grishka.appkit.imageloader.ImageCache;
 import me.grishka.appkit.utils.NetworkUtils;
@@ -29,6 +28,5 @@ public class MastodonApp extends Application{
 		NetworkUtils.setUserAgent("MastodonAndroid/"+BuildConfig.VERSION_NAME);
 
 		PushSubscriptionManager.tryRegisterFCM();
-		GlobalUserPreferences.load();
 	}
 }

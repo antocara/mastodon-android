@@ -2,14 +2,12 @@ package org.joinmastodon.android.ui;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowInsets;
@@ -19,14 +17,14 @@ import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
-import org.joinmastodon.android.GlobalUserPreferences;
+import org.joinmastodon.android.data.GlobalUserPreferences;
 import org.joinmastodon.android.MainActivity;
 import org.joinmastodon.android.R;
 import org.joinmastodon.android.api.requests.oauth.RevokeOauthToken;
 import org.joinmastodon.android.api.session.AccountSession;
 import org.joinmastodon.android.api.session.AccountSessionManager;
+import org.joinmastodon.android.data.GlobalUserPreferencesDataSource;
 import org.joinmastodon.android.fragments.SplashFragment;
-import org.joinmastodon.android.model.Account;
 import org.joinmastodon.android.ui.utils.UiUtils;
 
 import java.util.List;
@@ -241,10 +239,12 @@ public class AccountSwitcherSheet extends BottomSheet{
 		public final AccountSession session;
 		public final ImageLoaderRequest req;
 
+		private GlobalUserPreferencesDataSource globalUserPreferencesDataSource;
 		public WrappedAccount(AccountSession session){
+			this.globalUserPreferencesDataSource = new GlobalUserPreferences();
 			this.session=session;
 			if(session.self.avatar!=null)
-				req=new UrlImageLoaderRequest(GlobalUserPreferences.playGifs ? session.self.avatar : session.self.avatarStatic, V.dp(50), V.dp(50));
+				req=new UrlImageLoaderRequest(globalUserPreferencesDataSource.getPlayGifs() ? session.self.avatar : session.self.avatarStatic, V.dp(50), V.dp(50));
 			else
 				req=null;
 		}

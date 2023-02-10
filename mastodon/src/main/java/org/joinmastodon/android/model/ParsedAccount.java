@@ -2,7 +2,8 @@ package org.joinmastodon.android.model;
 
 import android.text.SpannableStringBuilder;
 
-import org.joinmastodon.android.GlobalUserPreferences;
+import org.joinmastodon.android.data.GlobalUserPreferences;
+import org.joinmastodon.android.data.GlobalUserPreferencesDataSource;
 import org.joinmastodon.android.ui.text.HtmlParser;
 import org.joinmastodon.android.ui.utils.CustomEmojiHelper;
 
@@ -18,7 +19,10 @@ public class ParsedAccount{
 	public CustomEmojiHelper emojiHelper;
 	public ImageLoaderRequest avatarRequest;
 
+	private GlobalUserPreferencesDataSource globalUserPreferencesDataSource;
+
 	public ParsedAccount(Account account, String accountID){
+		this.globalUserPreferencesDataSource = new GlobalUserPreferences();
 		this.account=account;
 		parsedName=HtmlParser.parseCustomEmoji(account.displayName, account.emojis);
 		parsedBio=HtmlParser.parse(account.note, account.emojis, Collections.emptyList(), Collections.emptyList(), accountID);
@@ -28,6 +32,6 @@ public class ParsedAccount{
 		ssb.append(parsedBio);
 		emojiHelper.setText(ssb);
 
-		avatarRequest=new UrlImageLoaderRequest(GlobalUserPreferences.playGifs ? account.avatar : account.avatarStatic, V.dp(40), V.dp(40));
+		avatarRequest=new UrlImageLoaderRequest(globalUserPreferencesDataSource.getPlayGifs() ? account.avatar : account.avatarStatic, V.dp(40), V.dp(40));
 	}
 }
