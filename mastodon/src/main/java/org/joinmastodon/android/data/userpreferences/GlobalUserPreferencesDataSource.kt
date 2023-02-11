@@ -1,4 +1,4 @@
-package org.joinmastodon.android.data
+package org.joinmastodon.android.data.userpreferences
 
 interface GlobalUserPreferencesDataSource {
     var playGifs: Boolean

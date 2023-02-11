@@ -7,18 +7,14 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
 import android.widget.Toast
-import me.grishka.appkit.api.Callback
-import me.grishka.appkit.api.ErrorResponse
-import org.joinmastodon.android.api.requests.accounts.GetOwnAccount
-import org.joinmastodon.android.api.requests.oauth.GetOauthToken
-import org.joinmastodon.android.api.session.AccountSessionManager
-import org.joinmastodon.android.model.Account
-import org.joinmastodon.android.model.Application
-import org.joinmastodon.android.model.Instance
-import org.joinmastodon.android.model.Token
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import org.joinmastodon.android.data.oauth.OauthDataSource
 import org.joinmastodon.android.ui.utils.UiUtils
+import org.koin.android.ext.android.inject
 
-class OAuthActivity : Activity() {
+class OAuthActivity : AppCompatActivity() {
 
     companion object {
         const val ERROR = "error"
@@ -26,17 +22,18 @@ class OAuthActivity : Activity() {
         const val ERROR_DESCRIPTION = "error_description"
     }
 
+    private val oauthDataSource: OauthDataSource by inject()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         UiUtils.setUserPreferredTheme(this)
         super.onCreate(savedInstanceState)
 
         val code = validateQueryParamsAndGetCode() ?: return
-        val dataSession = obtainDataSession() ?: return
 
         val progress = buildProgress()
         progress.show()
 
-        handleGetOauthToken(dataSession = dataSession, code = code, progress = progress)
+        handleGetOauthToken(code = code, progress = progress)
     }
 
     private fun validateQueryParamsAndGetCode(): String? {
@@ -59,58 +56,20 @@ class OAuthActivity : Activity() {
         }
     }
 
-    private fun obtainDataSession(): Pair<Instance, Application>? {
-        val instance = AccountSessionManager.getInstance().authenticatingInstance
-        val app = AccountSessionManager.getInstance().authenticatingApp
-        if (instance == null || app == null) {
-            finish()
-        }
-        return Pair(instance, app)
-    }
-
     private fun handleGetOauthToken(
-        dataSession: Pair<Instance, Application>,
         code: String,
         progress: ProgressDialog
     ) {
-        GetOauthToken(
-            dataSession.second.clientId,
-            dataSession.second.clientSecret,
-            code,
-            GetOauthToken.GrantType.AUTHORIZATION_CODE
-        )
-            .setCallback(object : Callback<Token?> {
-                override fun onSuccess(token: Token?) {
-                    GetOwnAccount()
-                        .setCallback(object : Callback<Account?> {
-                            override fun onSuccess(account: Account?) {
-                                AccountSessionManager.getInstance()
-                                    .addAccount(
-                                        dataSession.first,
-                                        token,
-                                        account,
-                                        dataSession.second,
-                                        null
-                                    )
-                                progress.dismiss()
-                                finish()
-                                openMainActivity()
-                            }
-
-                            override fun onError(error: ErrorResponse) {
-                                handleError(error)
-                                progress.dismiss()
-                            }
-                        })
-                        .exec(dataSession.first.uri, token)
-                }
-
-                override fun onError(error: ErrorResponse) {
-                    handleError(error)
-                    progress.dismiss()
-                }
-            })
-            .execNoAuth(dataSession.first.uri)
+        lifecycleScope.launch {
+            if (oauthDataSource.getOauthToken(code)) {
+                progress.dismiss()
+                finish()
+                openMainActivity()
+            } else {
+                handleError()
+                progress.dismiss()
+            }
+        }
     }
 
     private fun buildProgress(): ProgressDialog {
@@ -134,8 +93,8 @@ class OAuthActivity : Activity() {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
-    private fun handleError(error: ErrorResponse) {
-        error.showToast(this@OAuthActivity)
+    private fun handleError() {
+        Toast.makeText(this, "Errorrrrrrrr", Toast.LENGTH_LONG).show()
         finish()
         restartMainActivity()
     }

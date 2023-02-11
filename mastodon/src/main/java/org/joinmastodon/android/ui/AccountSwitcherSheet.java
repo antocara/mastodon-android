@@ -18,13 +18,13 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import org.joinmastodon.android.MusktodonApp;
-import org.joinmastodon.android.data.GlobalUserPreferences;
+import org.joinmastodon.android.data.userpreferences.GlobalUserPreferences;
 import org.joinmastodon.android.MainActivity;
 import org.joinmastodon.android.R;
 import org.joinmastodon.android.api.requests.oauth.RevokeOauthToken;
 import org.joinmastodon.android.api.session.AccountSession;
 import org.joinmastodon.android.api.session.AccountSessionManager;
-import org.joinmastodon.android.data.GlobalUserPreferencesDataSource;
+import org.joinmastodon.android.data.userpreferences.GlobalUserPreferencesDataSource;
 import org.joinmastodon.android.fragments.SplashFragment;
 import org.joinmastodon.android.ui.utils.UiUtils;
 

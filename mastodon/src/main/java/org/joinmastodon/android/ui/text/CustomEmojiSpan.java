@@ -7,8 +7,8 @@ import android.graphics.drawable.Drawable;
 import android.text.style.ReplacementSpan;
 
 import org.joinmastodon.android.MusktodonApp;
-import org.joinmastodon.android.data.GlobalUserPreferences;
-import org.joinmastodon.android.data.GlobalUserPreferencesDataSource;
+import org.joinmastodon.android.data.userpreferences.GlobalUserPreferences;
+import org.joinmastodon.android.data.userpreferences.GlobalUserPreferencesDataSource;
 import org.joinmastodon.android.model.Emoji;
 
 import androidx.annotation.NonNull;

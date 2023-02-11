@@ -1,8 +1,7 @@
-package org.joinmastodon.android.data
+package org.joinmastodon.android.data.userpreferences
 
 import android.content.Context
 import android.content.SharedPreferences
-import org.joinmastodon.android.MusktodonApp
 
 class GlobalUserPreferences(val context: Context) : GlobalUserPreferencesDataSource {
 

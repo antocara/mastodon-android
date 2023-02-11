@@ -97,6 +97,24 @@ dependencies {
     }
     // implementation "io.insert-koin:koin-androidx-compose:$koin_android_compose_version"
 
+    //COROUTINES
+    def lifecycle_version = "2.5.1"
+    // Lifecycles only (without ViewModel or LiveData)
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version") {
+        exclude group: 'androidx.collection', module: 'collection'
+        exclude group: 'androidx.concurrent', module: 'concurrent-futures'
+    }
+    // ViewModel
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"){
+        exclude group: 'androidx.collection', module: 'collection'
+        exclude group: 'androidx.concurrent', module: 'concurrent-futures'
+    }
+    // ViewModel utilities for Compose
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version"){
+        exclude group: 'androidx.collection', module: 'collection'
+        exclude group: 'androidx.concurrent', module: 'concurrent-futures'
+    }
+
 
     annotationProcessor 'org.parceler:parceler:1.1.12'
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
