@@ -26,8 +26,8 @@ jobs:
       # Step 2: Adding secrets
       - name: Adding secrets
         run: |
-            touch igdb.properties
-            echo applicationId=\"id\" >> local.properties
+            touch local.properties
+            echo Id=\"id\" >> local.properties
             echo SECRET_CLIENT=\"secret\" >> local.properties
             cat local.properties
       # Step 2: Check the code with ktlint
