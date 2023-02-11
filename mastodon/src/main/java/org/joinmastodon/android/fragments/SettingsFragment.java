@@ -29,7 +29,7 @@ import android.widget.Toast;
 import com.squareup.otto.Subscribe;
 
 import org.joinmastodon.android.BuildConfig;
-import org.joinmastodon.android.E;
+import org.joinmastodon.android.data.eventbus.EventBus;
 import org.joinmastodon.android.data.GlobalUserPreferences;
 import org.joinmastodon.android.MainActivity;
 import org.joinmastodon.android.MusktodonApp;
@@ -196,14 +196,14 @@ public class SettingsFragment extends MastodonToolbarFragment{
 	public void onViewCreated(View view, Bundle savedInstanceState){
 		super.onViewCreated(view, savedInstanceState);
 		if(GithubSelfUpdater.needSelfUpdating())
-			E.register(this);
+			EventBus.INSTANCE.register(this);
 	}
 
 	@Override
 	public void onDestroyView(){
 		super.onDestroyView();
 		if(GithubSelfUpdater.needSelfUpdating())
-			E.unregister(this);
+			EventBus.INSTANCE.unregister(this);
 	}
 
 	private void onThemePreferenceClick(ThemePreference theme){

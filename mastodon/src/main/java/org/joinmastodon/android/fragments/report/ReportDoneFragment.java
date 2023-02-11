@@ -11,7 +11,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.joinmastodon.android.E;
+import org.joinmastodon.android.data.eventbus.EventBus;
 import org.joinmastodon.android.R;
 import org.joinmastodon.android.api.requests.accounts.SetAccountFollowed;
 import org.joinmastodon.android.events.RemoveAccountPostsEvent;
@@ -26,7 +26,6 @@ import org.parceler.Parcels;
 import me.grishka.appkit.Nav;
 import me.grishka.appkit.api.Callback;
 import me.grishka.appkit.api.ErrorResponse;
-import me.grishka.appkit.fragments.ToolbarFragment;
 import me.grishka.appkit.imageloader.ViewImageLoader;
 import me.grishka.appkit.imageloader.requests.UrlImageLoaderRequest;
 import me.grishka.appkit.utils.CubicBezierInterpolator;
@@ -132,7 +131,7 @@ public class ReportDoneFragment extends MastodonToolbarFragment{
 					@Override
 					public void onSuccess(Relationship result){
 						Nav.finish(ReportDoneFragment.this);
-						E.post(new RemoveAccountPostsEvent(accountID, reportAccount.id, true));
+						EventBus.INSTANCE.post(new RemoveAccountPostsEvent(accountID, reportAccount.id, true));
 					}
 
 					@Override

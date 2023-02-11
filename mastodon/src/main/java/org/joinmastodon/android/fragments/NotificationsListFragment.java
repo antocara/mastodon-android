@@ -6,7 +6,7 @@ import android.view.View;
 
 import com.squareup.otto.Subscribe;
 
-import org.joinmastodon.android.E;
+import org.joinmastodon.android.data.eventbus.EventBus;
 import org.joinmastodon.android.R;
 import org.joinmastodon.android.api.requests.markers.SaveMarkers;
 import org.joinmastodon.android.api.session.AccountSessionManager;
@@ -42,13 +42,13 @@ public class NotificationsListFragment extends BaseStatusListFragment<Notificati
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		E.register(this);
+		EventBus.INSTANCE.register(this);
 	}
 
 	@Override
 	public void onDestroy(){
 		super.onDestroy();
-		E.unregister(this);
+		EventBus.INSTANCE.unregister(this);
 	}
 
 	@Override

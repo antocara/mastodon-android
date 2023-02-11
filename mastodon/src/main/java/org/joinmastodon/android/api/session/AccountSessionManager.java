@@ -14,7 +14,7 @@ import android.os.Build;
 import android.util.Log;
 
 import org.joinmastodon.android.BuildConfig;
-import org.joinmastodon.android.E;
+import org.joinmastodon.android.data.eventbus.EventBus;
 import org.joinmastodon.android.MainActivity;
 import org.joinmastodon.android.MusktodonApp;
 import org.joinmastodon.android.R;
@@ -333,7 +333,7 @@ public class AccountSessionManager{
 						customEmojis.put(domain, groupCustomEmojis(emojis));
 						instancesLastUpdated.put(domain, emojis.lastUpdated);
 						MastodonAPIController.runInBackground(()->writeInstanceInfoFile(emojis, domain));
-						E.post(new EmojiUpdatedEvent(domain));
+						EventBus.INSTANCE.post(new EmojiUpdatedEvent(domain));
 					}
 
 					@Override

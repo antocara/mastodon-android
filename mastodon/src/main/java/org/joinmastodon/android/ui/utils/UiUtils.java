@@ -35,7 +35,7 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.joinmastodon.android.E;
+import org.joinmastodon.android.data.eventbus.EventBus;
 import org.joinmastodon.android.data.GlobalUserPreferences;
 import org.joinmastodon.android.MusktodonApp;
 import org.joinmastodon.android.R;
@@ -340,7 +340,7 @@ public class UiUtils {
                                 public void onSuccess(Relationship result) {
                                     resultCallback.accept(result);
                                     if (!currentlyBlocked) {
-                                        E.post(new RemoveAccountPostsEvent(accountID, account.id, false));
+                                        EventBus.INSTANCE.post(new RemoveAccountPostsEvent(accountID, account.id, false));
                                     }
                                 }
 
@@ -385,7 +385,7 @@ public class UiUtils {
                                 public void onSuccess(Relationship result) {
                                     resultCallback.accept(result);
                                     if (!currentlyMuted) {
-                                        E.post(new RemoveAccountPostsEvent(accountID, account.id, false));
+                                        EventBus.INSTANCE.post(new RemoveAccountPostsEvent(accountID, account.id, false));
                                     }
                                 }
 
@@ -407,7 +407,7 @@ public class UiUtils {
                         public void onSuccess(Status result) {
                             resultCallback.accept(result);
                             AccountSessionManager.getInstance().getAccount(accountID).getCacheController().deleteStatus(status.id);
-                            E.post(new StatusDeletedEvent(status.id, accountID));
+                            EventBus.INSTANCE.post(new StatusDeletedEvent(status.id, accountID));
                         }
 
                         @Override
@@ -501,7 +501,7 @@ public class UiUtils {
                             resultCallback.accept(result);
                             progressCallback.accept(false);
                             if (!result.following) {
-                                E.post(new RemoveAccountPostsEvent(accountID, account.id, true));
+                                EventBus.INSTANCE.post(new RemoveAccountPostsEvent(accountID, account.id, true));
                             }
                         }
 

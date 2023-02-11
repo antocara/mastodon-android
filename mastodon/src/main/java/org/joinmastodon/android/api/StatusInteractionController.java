@@ -2,7 +2,7 @@ package org.joinmastodon.android.api;
 
 import android.os.Looper;
 
-import org.joinmastodon.android.E;
+import org.joinmastodon.android.data.eventbus.EventBus;
 import org.joinmastodon.android.MusktodonApp;
 import org.joinmastodon.android.api.requests.statuses.SetStatusBookmarked;
 import org.joinmastodon.android.api.requests.statuses.SetStatusFavorited;
@@ -38,7 +38,7 @@ public class StatusInteractionController{
 					@Override
 					public void onSuccess(Status result){
 						runningFavoriteRequests.remove(status.id);
-						E.post(new StatusCountersUpdatedEvent(result));
+						EventBus.INSTANCE.post(new StatusCountersUpdatedEvent(result));
 					}
 
 					@Override
@@ -50,7 +50,7 @@ public class StatusInteractionController{
 							status.favouritesCount--;
 						else
 							status.favouritesCount++;
-						E.post(new StatusCountersUpdatedEvent(status));
+						EventBus.INSTANCE.post(new StatusCountersUpdatedEvent(status));
 					}
 				})
 				.exec(accountID);
@@ -60,7 +60,7 @@ public class StatusInteractionController{
 			status.favouritesCount++;
 		else
 			status.favouritesCount--;
-		E.post(new StatusCountersUpdatedEvent(status));
+		EventBus.INSTANCE.post(new StatusCountersUpdatedEvent(status));
 	}
 
 	public void setReblogged(Status status, boolean reblogged){
@@ -76,7 +76,7 @@ public class StatusInteractionController{
 					@Override
 					public void onSuccess(Status result){
 						runningReblogRequests.remove(status.id);
-						E.post(new StatusCountersUpdatedEvent(result));
+						EventBus.INSTANCE.post(new StatusCountersUpdatedEvent(result));
 					}
 
 					@Override
@@ -88,7 +88,7 @@ public class StatusInteractionController{
 							status.reblogsCount--;
 						else
 							status.reblogsCount++;
-						E.post(new StatusCountersUpdatedEvent(status));
+						EventBus.INSTANCE.post(new StatusCountersUpdatedEvent(status));
 					}
 				})
 				.exec(accountID);
@@ -98,7 +98,7 @@ public class StatusInteractionController{
 			status.reblogsCount++;
 		else
 			status.reblogsCount--;
-		E.post(new StatusCountersUpdatedEvent(status));
+		EventBus.INSTANCE.post(new StatusCountersUpdatedEvent(status));
 	}
 
 	public void setBookmarked(Status status, boolean bookmarked){
@@ -114,7 +114,7 @@ public class StatusInteractionController{
 					@Override
 					public void onSuccess(Status result){
 						runningBookmarkRequests.remove(status.id);
-						E.post(new StatusCountersUpdatedEvent(result));
+						EventBus.INSTANCE.post(new StatusCountersUpdatedEvent(result));
 					}
 
 					@Override
@@ -122,12 +122,12 @@ public class StatusInteractionController{
 						runningBookmarkRequests.remove(status.id);
 						error.showToast(MusktodonApp.context);
 						status.bookmarked=!bookmarked;
-						E.post(new StatusCountersUpdatedEvent(status));
+						EventBus.INSTANCE.post(new StatusCountersUpdatedEvent(status));
 					}
 				})
 				.exec(accountID);
 		runningBookmarkRequests.put(status.id, req);
 		status.bookmarked=bookmarked;
-		E.post(new StatusCountersUpdatedEvent(status));
+		EventBus.INSTANCE.post(new StatusCountersUpdatedEvent(status));
 	}
 }
