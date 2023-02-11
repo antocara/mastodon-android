@@ -20,7 +20,7 @@ import com.google.gson.JsonParser;
 
 import org.joinmastodon.android.BuildConfig;
 import org.joinmastodon.android.E;
-import org.joinmastodon.android.MastodonApp;
+import org.joinmastodon.android.MusktodonApp;
 import org.joinmastodon.android.R;
 import org.joinmastodon.android.api.MastodonAPIController;
 import org.joinmastodon.android.events.SelfUpdateStateChangedEvent;
@@ -46,7 +46,7 @@ public class GithubSelfUpdaterImpl extends GithubSelfUpdater{
 		@Override
 		public void onReceive(Context context, Intent intent){
 			if(downloadID!=0 && intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0)==downloadID){
-				MastodonApp.context.unregisterReceiver(this);
+				MusktodonApp.context.unregisterReceiver(this);
 				setState(UpdateState.DOWNLOADED);
 			}
 		}
@@ -63,17 +63,17 @@ public class GithubSelfUpdaterImpl extends GithubSelfUpdater{
 			if(downloadID==0 || !getUpdateApkFile().exists()){
 				state=UpdateState.UPDATE_AVAILABLE;
 			}else{
-				DownloadManager dm=MastodonApp.context.getSystemService(DownloadManager.class);
+				DownloadManager dm=MusktodonApp.context.getSystemService(DownloadManager.class);
 				state=dm.getUriForDownloadedFile(downloadID)==null ? UpdateState.DOWNLOADING : UpdateState.DOWNLOADED;
 				if(state==UpdateState.DOWNLOADING){
-					MastodonApp.context.registerReceiver(downloadCompletionReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+					MusktodonApp.context.registerReceiver(downloadCompletionReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 				}
 			}
 		}else if(checkedByBuild!=BuildConfig.VERSION_CODE && checkedByBuild>0){
 			// We are in a new version, running for the first time after update. Gotta clean things up.
 			long id=getPrefs().getLong("downloadID", 0);
 			if(id!=0){
-				MastodonApp.context.getSystemService(DownloadManager.class).remove(id);
+				MusktodonApp.context.getSystemService(DownloadManager.class).remove(id);
 			}
 			getUpdateApkFile().delete();
 			getPrefs().edit()
@@ -87,7 +87,7 @@ public class GithubSelfUpdaterImpl extends GithubSelfUpdater{
 	}
 
 	private SharedPreferences getPrefs(){
-		return MastodonApp.context.getSharedPreferences("githubUpdater", Context.MODE_PRIVATE);
+		return MusktodonApp.context.getSharedPreferences("githubUpdater", Context.MODE_PRIVATE);
 	}
 
 	@Override
@@ -174,15 +174,15 @@ public class GithubSelfUpdaterImpl extends GithubSelfUpdater{
 	}
 
 	public File getUpdateApkFile(){
-		return new File(MastodonApp.context.getExternalCacheDir(), "update.apk");
+		return new File(MusktodonApp.context.getExternalCacheDir(), "update.apk");
 	}
 
 	@Override
 	public void downloadUpdate(){
 		if(state==UpdateState.DOWNLOADING)
 			throw new IllegalStateException();
-		DownloadManager dm=MastodonApp.context.getSystemService(DownloadManager.class);
-		MastodonApp.context.registerReceiver(downloadCompletionReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+		DownloadManager dm=MusktodonApp.context.getSystemService(DownloadManager.class);
+		MusktodonApp.context.registerReceiver(downloadCompletionReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 		downloadID=dm.enqueue(
 				new DownloadManager.Request(Uri.parse(getPrefs().getString("apkURL", null)))
 						.setDestinationUri(Uri.fromFile(getUpdateApkFile()))
@@ -260,7 +260,7 @@ public class GithubSelfUpdaterImpl extends GithubSelfUpdater{
 	public float getDownloadProgress(){
 		if(state!=UpdateState.DOWNLOADING)
 			throw new IllegalStateException();
-		DownloadManager dm=MastodonApp.context.getSystemService(DownloadManager.class);
+		DownloadManager dm=MusktodonApp.context.getSystemService(DownloadManager.class);
 		try(Cursor cursor=dm.query(new DownloadManager.Query().setFilterById(downloadID))){
 			if(cursor.moveToFirst()){
 				long loaded=cursor.getLong(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
@@ -276,7 +276,7 @@ public class GithubSelfUpdaterImpl extends GithubSelfUpdater{
 	public void cancelDownload(){
 		if(state!=UpdateState.DOWNLOADING)
 			throw new IllegalStateException();
-		DownloadManager dm=MastodonApp.context.getSystemService(DownloadManager.class);
+		DownloadManager dm=MusktodonApp.context.getSystemService(DownloadManager.class);
 		dm.remove(downloadID);
 		downloadID=0;
 		getPrefs().edit().remove("downloadID").apply();
