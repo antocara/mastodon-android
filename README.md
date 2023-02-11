@@ -1,4 +1,4 @@
-[![Android CI](https://github.com/antocara/musktodon/actions/workflows/android.yml/badge.svg)](https://github.com/antocara/musktodon/actions/workflows/pr_merge.yml)
+[![Android CI](https://github.com/antocara/musktodon/actions/workflows/pr_merge.yml/badge.svg)](https://github.com/antocara/musktodon/actions/workflows/pr_merge.yml)
 
 Musktodon for Android
 ======================
