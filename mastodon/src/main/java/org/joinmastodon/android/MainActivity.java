@@ -70,14 +70,14 @@ public class MainActivity extends FragmentStackActivity{
 			}
 		}
 
-		if(BuildConfig.BUILD_TYPE.startsWith("appcenter")){
-			// Call the appcenter SDK wrapper through reflection because it is only present in beta builds
-			try{
-				Class.forName("org.joinmastodon.android.AppCenterWrapper").getMethod("init", Application.class).invoke(null, getApplication());
-			}catch(ClassNotFoundException|NoSuchMethodException|IllegalAccessException|InvocationTargetException ignore){}
-		}else if(GithubSelfUpdater.needSelfUpdating()){
-			GithubSelfUpdater.getInstance().maybeCheckForUpdates();
-		}
+//		if(BuildConfig.BUILD_TYPE.startsWith("appcenter")){
+//			// Call the appcenter SDK wrapper through reflection because it is only present in beta builds
+//			try{
+//				Class.forName("org.joinmastodon.android.AppCenterWrapper").getMethod("init", Application.class).invoke(null, getApplication());
+//			}catch(ClassNotFoundException|NoSuchMethodException|IllegalAccessException|InvocationTargetException ignore){}
+//		}else if(GithubSelfUpdater.needSelfUpdating()){
+//			GithubSelfUpdater.getInstance().maybeCheckForUpdates();
+//		}
 	}
 
 	@Override

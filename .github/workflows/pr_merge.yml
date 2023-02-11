@@ -28,7 +28,7 @@ jobs:
         run: |
             touch local.properties
             echo Id=\"id\" >> local.properties
-            echo SECRET_CLIENT=\"secret\" >> local.properties
+            echo appCenterKey=\"secret\" >> local.properties
             cat local.properties
       # Step 2: Check the code with ktlint
 #      - name: Run Kotlin Linter
