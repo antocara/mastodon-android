@@ -1,0 +1,39 @@
+name: PR Merge CI
+
+on:
+  #push:
+  #branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  Testing:
+    name: Lint check and Testing
+
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Clone and setup Java
+      - name: Clone Repo
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+
+      # Step 2: Adding secrets
+      - name: Adding secrets
+        run: |
+            touch local.properties
+            echo Id=\"id\" >> local.properties
+            echo appCenterKey=\"secret\" >> local.properties
+            cat local.properties
+      # Step 2: Check the code with ktlint
+#      - name: Run Kotlin Linter
+#        run: ./gradlew lint
+
+      #  Step 3: Yun your unit tests
+      - name: Run Unit Test
+        run: ./gradlew test --stacktrace
