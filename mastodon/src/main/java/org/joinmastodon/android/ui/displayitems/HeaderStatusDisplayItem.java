@@ -19,6 +19,7 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.joinmastodon.android.MusktodonApp;
 import org.joinmastodon.android.data.GlobalUserPreferences;
 import org.joinmastodon.android.R;
 import org.joinmastodon.android.api.requests.accounts.GetAccountRelationships;
@@ -67,7 +68,7 @@ public class HeaderStatusDisplayItem extends StatusDisplayItem{
 
 	public HeaderStatusDisplayItem(String parentID, Account user, Instant createdAt, BaseStatusListFragment parentFragment, String accountID, Status status, String extraText){
 		super(parentID, parentFragment);
-		this.globalUserPreferencesDataSource = new GlobalUserPreferences();
+		this.globalUserPreferencesDataSource = new GlobalUserPreferences(MusktodonApp.context);
 		this.user=user;
 		this.createdAt=createdAt;
 		avaRequest=new UrlImageLoaderRequest(globalUserPreferencesDataSource.getPlayGifs() ? user.avatar : user.avatarStatic, V.dp(50), V.dp(50));

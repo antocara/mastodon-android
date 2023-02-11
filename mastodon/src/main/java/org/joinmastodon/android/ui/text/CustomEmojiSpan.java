@@ -6,6 +6,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.text.style.ReplacementSpan;
 
+import org.joinmastodon.android.MusktodonApp;
 import org.joinmastodon.android.data.GlobalUserPreferences;
 import org.joinmastodon.android.data.GlobalUserPreferencesDataSource;
 import org.joinmastodon.android.model.Emoji;
@@ -24,7 +25,7 @@ public class CustomEmojiSpan extends ReplacementSpan{
 	public CustomEmojiSpan(Emoji emoji){
 
 		this.emoji=emoji;
-		this.globalUserPreferencesDataSource = new GlobalUserPreferences();
+		this.globalUserPreferencesDataSource = new GlobalUserPreferences(MusktodonApp.context);
 	}
 
 	@Override

@@ -10,7 +10,7 @@ import android.os.Looper;
 import android.util.Log;
 
 import org.joinmastodon.android.BuildConfig;
-import org.joinmastodon.android.MastodonApp;
+import org.joinmastodon.android.MusktodonApp;
 import org.joinmastodon.android.api.requests.notifications.GetNotifications;
 import org.joinmastodon.android.api.requests.timelines.GetHomeTimeline;
 import org.joinmastodon.android.api.session.AccountSessionManager;
@@ -291,7 +291,7 @@ public class CacheController{
 	private class DatabaseHelper extends SQLiteOpenHelper{
 
 		public DatabaseHelper(){
-			super(MastodonApp.context, accountID+".db", null, DB_VERSION);
+			super(MusktodonApp.context, accountID+".db", null, DB_VERSION);
 		}
 
 		@Override

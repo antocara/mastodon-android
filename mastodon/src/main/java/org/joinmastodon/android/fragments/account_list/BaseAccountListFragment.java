@@ -18,6 +18,7 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
+import org.joinmastodon.android.MusktodonApp;
 import org.joinmastodon.android.data.GlobalUserPreferences;
 import org.joinmastodon.android.R;
 import org.joinmastodon.android.api.requests.accounts.GetAccountRelationships;
@@ -388,7 +389,7 @@ public abstract class BaseAccountListFragment extends BaseRecyclerFragment<BaseA
 		private GlobalUserPreferencesDataSource globalUserPreferencesDataSource;
 
 		public AccountItem(Account account){
-			this.globalUserPreferencesDataSource = new GlobalUserPreferences();
+			this.globalUserPreferencesDataSource = new GlobalUserPreferences(MusktodonApp.context);
 			this.account=account;
 			avaRequest=new UrlImageLoaderRequest(globalUserPreferencesDataSource.getPlayGifs() ? account.avatar : account.avatarStatic, V.dp(50), V.dp(50));
 			emojiHelper=new CustomEmojiHelper();

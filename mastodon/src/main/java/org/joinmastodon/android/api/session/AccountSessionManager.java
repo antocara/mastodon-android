@@ -13,12 +13,10 @@ import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 
-import com.google.gson.JsonParseException;
-
 import org.joinmastodon.android.BuildConfig;
 import org.joinmastodon.android.E;
 import org.joinmastodon.android.MainActivity;
-import org.joinmastodon.android.MastodonApp;
+import org.joinmastodon.android.MusktodonApp;
 import org.joinmastodon.android.R;
 import org.joinmastodon.android.api.MastodonAPIController;
 import org.joinmastodon.android.api.PushSubscriptionManager;
@@ -81,8 +79,8 @@ public class AccountSessionManager{
 	}
 
 	private AccountSessionManager(){
-		prefs=MastodonApp.context.getSharedPreferences("account_manager", Context.MODE_PRIVATE);
-		File file=new File(MastodonApp.context.getFilesDir(), "accounts.json");
+		prefs= MusktodonApp.context.getSharedPreferences("account_manager", Context.MODE_PRIVATE);
+		File file=new File(MusktodonApp.context.getFilesDir(), "accounts.json");
 		if(!file.exists())
 			return;
 		HashSet<String> domains=new HashSet<>();
@@ -114,7 +112,7 @@ public class AccountSessionManager{
 	}
 
 	public synchronized void writeAccountsFile(){
-		File file=new File(MastodonApp.context.getFilesDir(), "accounts.json");
+		File file=new File(MusktodonApp.context.getFilesDir(), "accounts.json");
 		try{
 			try(FileOutputStream out=new FileOutputStream(file)){
 				SessionsStorageWrapper w=new SessionsStorageWrapper();
@@ -173,7 +171,7 @@ public class AccountSessionManager{
 	public void removeAccount(String id){
 		AccountSession session=getAccount(id);
 		session.getCacheController().closeDatabase();
-		MastodonApp.context.deleteDatabase(id+".db");
+		MusktodonApp.context.deleteDatabase(id+".db");
 		sessions.remove(id);
 		if(lastActiveAccountID.equals(id)){
 			if(sessions.isEmpty())
@@ -187,7 +185,7 @@ public class AccountSessionManager{
 			getInstanceInfoFile(domain).delete();
 		}
 		if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
-			NotificationManager nm=MastodonApp.context.getSystemService(NotificationManager.class);
+			NotificationManager nm= MusktodonApp.context.getSystemService(NotificationManager.class);
 			nm.deleteNotificationChannelGroup(id);
 		}
 		maybeUpdateShortcuts();
@@ -347,7 +345,7 @@ public class AccountSessionManager{
 	}
 
 	private File getInstanceInfoFile(String domain){
-		return new File(MastodonApp.context.getFilesDir(), "instance_"+domain.replace('.', '_')+".json");
+		return new File(MusktodonApp.context.getFilesDir(), "instance_"+domain.replace('.', '_')+".json");
 	}
 
 	private void writeInstanceInfoFile(InstanceInfoStorageWrapper emojis, String domain){
@@ -408,21 +406,21 @@ public class AccountSessionManager{
 	private void maybeUpdateShortcuts(){
 		if(Build.VERSION.SDK_INT<26)
 			return;
-		ShortcutManager sm=MastodonApp.context.getSystemService(ShortcutManager.class);
+		ShortcutManager sm= MusktodonApp.context.getSystemService(ShortcutManager.class);
 		if((sm.getDynamicShortcuts().isEmpty() || BuildConfig.DEBUG) && !sessions.isEmpty()){
 			// There are no shortcuts, but there are accounts. Add a compose shortcut.
-			ShortcutInfo info=new ShortcutInfo.Builder(MastodonApp.context, "compose")
-					.setActivity(ComponentName.createRelative(MastodonApp.context, MainActivity.class.getName()))
-					.setShortLabel(MastodonApp.context.getString(R.string.new_post))
-					.setIcon(Icon.createWithResource(MastodonApp.context, R.mipmap.ic_shortcut_compose))
-					.setIntent(new Intent(MastodonApp.context, MainActivity.class)
+			ShortcutInfo info=new ShortcutInfo.Builder(MusktodonApp.context, "compose")
+					.setActivity(ComponentName.createRelative(MusktodonApp.context, MainActivity.class.getName()))
+					.setShortLabel(MusktodonApp.context.getString(R.string.new_post))
+					.setIcon(Icon.createWithResource(MusktodonApp.context, R.mipmap.ic_shortcut_compose))
+					.setIntent(new Intent(MusktodonApp.context, MainActivity.class)
 							.setAction(Intent.ACTION_MAIN)
 							.putExtra("compose", true))
 					.build();
 			sm.setDynamicShortcuts(Collections.singletonList(info));
 		}else if(sessions.isEmpty()){
 			// There are shortcuts, but no accounts. Disable existing shortcuts.
-			sm.disableShortcuts(Collections.singletonList("compose"), MastodonApp.context.getString(R.string.err_not_logged_in));
+			sm.disableShortcuts(Collections.singletonList("compose"), MusktodonApp.context.getString(R.string.err_not_logged_in));
 		}else{
 			sm.enableShortcuts(Collections.singletonList("compose"));
 		}

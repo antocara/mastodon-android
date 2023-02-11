@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import org.joinmastodon.android.MastodonApp;
+import org.joinmastodon.android.MusktodonApp;
 import org.joinmastodon.android.R;
 
 import me.grishka.appkit.utils.CubicBezierInterpolator;
@@ -22,7 +22,7 @@ public class DiscoverInfoBannerHelper{
 	}
 
 	private SharedPreferences getPrefs(){
-		return MastodonApp.context.getSharedPreferences("onboarding", Context.MODE_PRIVATE);
+		return MusktodonApp.context.getSharedPreferences("onboarding", Context.MODE_PRIVATE);
 	}
 
 	public void maybeAddBanner(FrameLayout view){

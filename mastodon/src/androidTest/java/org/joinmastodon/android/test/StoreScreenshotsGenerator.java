@@ -10,7 +10,7 @@ import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matcher;
 import org.joinmastodon.android.data.GlobalUserPreferences;
 import org.joinmastodon.android.MainActivity;
-import org.joinmastodon.android.MastodonApp;
+import org.joinmastodon.android.MusktodonApp;
 import org.joinmastodon.android.R;
 import org.joinmastodon.android.api.requests.instance.GetInstance;
 import org.joinmastodon.android.api.requests.statuses.GetStatusByID;
@@ -63,7 +63,7 @@ public class StoreScreenshotsGenerator{
 
 	@Test
 	public void takeScreenshots() throws Exception{
-		File photo=new File(MastodonApp.context.getCacheDir(), PHOTO_FILE);
+		File photo=new File(MusktodonApp.context.getCacheDir(), PHOTO_FILE);
 		try(Source source=Okio.source(InstrumentationRegistry.getInstrumentation().getContext().getAssets().open(PHOTO_FILE)); BufferedSink sink=Okio.buffer(Okio.sink(photo))){
 			sink.writeAll(source);
 			sink.flush();
@@ -74,7 +74,7 @@ public class StoreScreenshotsGenerator{
 		InstrumentationRegistry.getInstrumentation().setInTouchMode(true);
 
 		AccountSession session=AccountSessionManager.getInstance().getAccount(AccountSessionManager.getInstance().getLastActiveAccountID());
-		MastodonApp.context.deleteDatabase(session.getID()+".db");
+		MusktodonApp.context.deleteDatabase(session.getID()+".db");
 
 		onView(isRoot()).perform(waitId(R.id.more, 5000));
 		Thread.sleep(500);
