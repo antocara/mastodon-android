@@ -168,7 +168,7 @@ public class HomeTimelineFragment extends StatusListFragment{
 	}
 
 	public void onStatusCreated(StatusCreatedEvent ev){
-		prependItems(Collections.singletonList(ev.status), true);
+		prependItems(Collections.singletonList(ev.getStatus()), true);
 	}
 
 	private void onFabClick(View v){
@@ -445,7 +445,7 @@ public class HomeTimelineFragment extends StatusListFragment{
 
 	@Subscribe
 	public void onSelfUpdateStateChanged(SelfUpdateStateChangedEvent ev){
-		updateUpdateState(ev.state);
+		updateUpdateState(ev.getState());
 	}
 
 	@Override

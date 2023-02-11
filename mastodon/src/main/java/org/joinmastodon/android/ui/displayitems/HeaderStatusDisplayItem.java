@@ -19,11 +19,12 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.joinmastodon.android.GlobalUserPreferences;
+import org.joinmastodon.android.data.GlobalUserPreferences;
 import org.joinmastodon.android.R;
 import org.joinmastodon.android.api.requests.accounts.GetAccountRelationships;
 import org.joinmastodon.android.api.requests.statuses.GetStatusSourceText;
 import org.joinmastodon.android.api.session.AccountSessionManager;
+import org.joinmastodon.android.data.GlobalUserPreferencesDataSource;
 import org.joinmastodon.android.fragments.BaseStatusListFragment;
 import org.joinmastodon.android.fragments.ComposeFragment;
 import org.joinmastodon.android.fragments.ProfileFragment;
@@ -62,11 +63,14 @@ public class HeaderStatusDisplayItem extends StatusDisplayItem{
 	boolean needBottomPadding;
 	private String extraText;
 
+	private GlobalUserPreferencesDataSource globalUserPreferencesDataSource;
+
 	public HeaderStatusDisplayItem(String parentID, Account user, Instant createdAt, BaseStatusListFragment parentFragment, String accountID, Status status, String extraText){
 		super(parentID, parentFragment);
+		this.globalUserPreferencesDataSource = new GlobalUserPreferences();
 		this.user=user;
 		this.createdAt=createdAt;
-		avaRequest=new UrlImageLoaderRequest(GlobalUserPreferences.playGifs ? user.avatar : user.avatarStatic, V.dp(50), V.dp(50));
+		avaRequest=new UrlImageLoaderRequest(globalUserPreferencesDataSource.getPlayGifs() ? user.avatar : user.avatarStatic, V.dp(50), V.dp(50));
 		this.accountID=accountID;
 		parsedName=new SpannableStringBuilder(user.displayName);
 		this.status=status;

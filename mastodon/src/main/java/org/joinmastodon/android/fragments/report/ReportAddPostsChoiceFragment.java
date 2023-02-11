@@ -284,7 +284,7 @@ public class ReportAddPostsChoiceFragment extends StatusListFragment{
 
 	@Subscribe
 	public void onFinishReportFragments(FinishReportFragmentsEvent ev){
-		if(ev.reportAccountID.equals(reportAccount.id))
+		if(ev.getReportAccountID().equals(reportAccount.id))
 			Nav.finish(this);
 	}
 

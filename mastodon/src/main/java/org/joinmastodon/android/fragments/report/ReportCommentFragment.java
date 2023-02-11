@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import me.grishka.appkit.Nav;
 import me.grishka.appkit.api.Callback;
 import me.grishka.appkit.api.ErrorResponse;
-import me.grishka.appkit.fragments.ToolbarFragment;
 import me.grishka.appkit.utils.V;
 
 public class ReportCommentFragment extends MastodonToolbarFragment{
@@ -125,7 +124,7 @@ public class ReportCommentFragment extends MastodonToolbarFragment{
 
 	@Subscribe
 	public void onFinishReportFragments(FinishReportFragmentsEvent ev){
-		if(ev.reportAccountID.equals(reportAccount.id))
+		if(ev.getReportAccountID().equals(reportAccount.id))
 			Nav.finish(this);
 	}
 }

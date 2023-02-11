@@ -18,11 +18,12 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
-import org.joinmastodon.android.GlobalUserPreferences;
+import org.joinmastodon.android.data.GlobalUserPreferences;
 import org.joinmastodon.android.R;
 import org.joinmastodon.android.api.requests.accounts.GetAccountRelationships;
 import org.joinmastodon.android.api.requests.accounts.SetAccountFollowed;
 import org.joinmastodon.android.api.session.AccountSessionManager;
+import org.joinmastodon.android.data.GlobalUserPreferencesDataSource;
 import org.joinmastodon.android.fragments.ProfileFragment;
 import org.joinmastodon.android.fragments.report.ReportReasonChoiceFragment;
 import org.joinmastodon.android.model.Account;
@@ -384,9 +385,12 @@ public abstract class BaseAccountListFragment extends BaseRecyclerFragment<BaseA
 		public final CustomEmojiHelper emojiHelper;
 		public final CharSequence parsedName;
 
+		private GlobalUserPreferencesDataSource globalUserPreferencesDataSource;
+
 		public AccountItem(Account account){
+			this.globalUserPreferencesDataSource = new GlobalUserPreferences();
 			this.account=account;
-			avaRequest=new UrlImageLoaderRequest(GlobalUserPreferences.playGifs ? account.avatar : account.avatarStatic, V.dp(50), V.dp(50));
+			avaRequest=new UrlImageLoaderRequest(globalUserPreferencesDataSource.getPlayGifs() ? account.avatar : account.avatarStatic, V.dp(50), V.dp(50));
 			emojiHelper=new CustomEmojiHelper();
 			emojiHelper.setText(parsedName=HtmlParser.parseCustomEmoji(account.displayName, account.emojis));
 		}

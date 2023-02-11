@@ -6,7 +6,8 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.text.style.ReplacementSpan;
 
-import org.joinmastodon.android.GlobalUserPreferences;
+import org.joinmastodon.android.data.GlobalUserPreferences;
+import org.joinmastodon.android.data.GlobalUserPreferencesDataSource;
 import org.joinmastodon.android.model.Emoji;
 
 import androidx.annotation.NonNull;
@@ -18,8 +19,12 @@ public class CustomEmojiSpan extends ReplacementSpan{
 	public final Emoji emoji;
 	private Drawable drawable;
 
+	private GlobalUserPreferencesDataSource globalUserPreferencesDataSource;
+
 	public CustomEmojiSpan(Emoji emoji){
+
 		this.emoji=emoji;
+		this.globalUserPreferencesDataSource = new GlobalUserPreferences();
 	}
 
 	@Override
@@ -54,6 +59,6 @@ public class CustomEmojiSpan extends ReplacementSpan{
 
 	public UrlImageLoaderRequest createImageLoaderRequest(){
 		int size=V.dp(20);
-		return new UrlImageLoaderRequest(GlobalUserPreferences.playGifs ? emoji.url : emoji.staticUrl, size, size);
+		return new UrlImageLoaderRequest(globalUserPreferencesDataSource.getPlayGifs() ? emoji.url : emoji.staticUrl, size, size);
 	}
 }

@@ -175,24 +175,24 @@ public class NotificationsListFragment extends BaseStatusListFragment<Notificati
 
 	@Subscribe
 	public void onPollUpdated(PollUpdatedEvent ev){
-		if(!ev.accountID.equals(accountID))
+		if(!ev.getAccountID().equals(accountID))
 			return;
 		for(Notification ntf:data){
 			if(ntf.status==null)
 				continue;
 			Status contentStatus=ntf.status.getContentStatus();
-			if(contentStatus.poll!=null && contentStatus.poll.id.equals(ev.poll.id)){
-				updatePoll(ntf.id, ntf.status, ev.poll);
+			if(contentStatus.poll!=null && contentStatus.poll.id.equals(ev.getPoll().id)){
+				updatePoll(ntf.id, ntf.status, ev.getPoll());
 			}
 		}
 	}
 
 	@Subscribe
 	public void onRemoveAccountPostsEvent(RemoveAccountPostsEvent ev){
-		if(!ev.accountID.equals(accountID) || ev.isUnfollow)
+		if(!ev.getAccountID().equals(accountID) || ev.isUnfollow())
 			return;
 		List<Notification> toRemove=Stream.concat(data.stream(), preloadedData.stream())
-				.filter(n->n.account!=null && n.account.id.equals(ev.postsByAccountID))
+				.filter(n->n.account!=null && n.account.id.equals(ev.getPostsByAccountID()))
 				.collect(Collectors.toList());
 		for(Notification n:toRemove){
 			removeNotification(n);
