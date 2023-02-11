@@ -22,7 +22,14 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 17
-
+            -
+      # Step 2: Adding secrets
+      - name: Adding secrets
+        run: |
+            touch igdb.properties
+            echo applicationId=\"id\" >> igdb.properties
+            echo SECRET_CLIENT=\"secret\" >> igdb.properties
+            cat igdb.properties
       # Step 2: Check the code with ktlint
 #      - name: Run Kotlin Linter
 #        run: ./gradlew lint
