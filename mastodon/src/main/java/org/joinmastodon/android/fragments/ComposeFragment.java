@@ -1,7 +1,5 @@
 package org.joinmastodon.android.fragments;
 
-import static android.os.ext.SdkExtensions.getExtensionVersion;
-
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -56,7 +54,7 @@ import android.widget.Toast;
 import com.twitter.twittertext.TwitterTextEmojiRegex;
 
 import org.joinmastodon.android.E;
-import org.joinmastodon.android.MastodonApp;
+import org.joinmastodon.android.MusktodonApp;
 import org.joinmastodon.android.R;
 import org.joinmastodon.android.api.MastodonAPIController;
 import org.joinmastodon.android.api.MastodonErrorResponse;
@@ -861,7 +859,7 @@ public class ComposeFragment extends MastodonToolbarFragment implements OnBackPr
 			if(!type.startsWith("image/")){
 				int sizeLimit=instance.configuration.mediaAttachments.videoSizeLimit;
 				int size;
-				try(Cursor cursor=MastodonApp.context.getContentResolver().query(uri, new String[]{OpenableColumns.SIZE}, null, null, null)){
+				try(Cursor cursor= MusktodonApp.context.getContentResolver().query(uri, new String[]{OpenableColumns.SIZE}, null, null, null)){
 					cursor.moveToFirst();
 					size=cursor.getInt(0);
 				}catch(Exception x){

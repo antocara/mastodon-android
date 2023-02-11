@@ -2,9 +2,9 @@ package org.joinmastodon.android.data
 
 import android.content.Context
 import android.content.SharedPreferences
-import org.joinmastodon.android.MastodonApp
+import org.joinmastodon.android.MusktodonApp
 
-class GlobalUserPreferences : GlobalUserPreferencesDataSource {
+class GlobalUserPreferences(val context: Context) : GlobalUserPreferencesDataSource {
 
     companion object {
         private const val GLOBAL_PREFERENCES_NAME = "global"
@@ -15,7 +15,7 @@ class GlobalUserPreferences : GlobalUserPreferencesDataSource {
     }
 
     private val prefs: SharedPreferences
-        get() = MastodonApp.context.getSharedPreferences(
+        get() = context.getSharedPreferences(
             GLOBAL_PREFERENCES_NAME,
             Context.MODE_PRIVATE
         )

@@ -85,6 +85,18 @@ dependencies {
     implementation('me.grishka.appkit:appkit:1.2.7')
     implementation('me.grishka.litex:collection:1.1.0')
 
+    //KOIN
+    def koin_android_version = "3.3.3"
+    def koin_android_compose_version = "3.4.2"
+    def koin_core_version = "3.3.3"
+    implementation "io.insert-koin:koin-core:$koin_core_version"
+    implementation("io.insert-koin:koin-android:$koin_android_version") {
+        exclude group: 'androidx.collection', module: 'collection'
+        exclude group: 'androidx.concurrent', module: 'concurrent-futures'
+        exclude group: 'androidx.viewpager', module: 'viewpager'
+    }
+    // implementation "io.insert-koin:koin-androidx-compose:$koin_android_compose_version"
+
 
     annotationProcessor 'org.parceler:parceler:1.1.12'
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'

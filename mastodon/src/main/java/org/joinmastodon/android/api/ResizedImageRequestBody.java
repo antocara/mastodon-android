@@ -14,7 +14,7 @@ import android.os.Build;
 import android.provider.OpenableColumns;
 import android.text.TextUtils;
 
-import org.joinmastodon.android.MastodonApp;
+import org.joinmastodon.android.MusktodonApp;
 import org.joinmastodon.android.ui.utils.UiUtils;
 
 import java.io.File;
@@ -22,7 +22,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import androidx.annotation.NonNull;
 import okhttp3.MediaType;
 import okio.BufferedSink;
 import okio.Okio;
@@ -44,10 +43,10 @@ public class ResizedImageRequestBody extends CountingRequestBody{
 			BitmapFactory.decodeFile(uri.getPath(), opts);
 			contentType=UiUtils.getFileMediaType(new File(uri.getPath())).type();
 		}else{
-			try(InputStream in=MastodonApp.context.getContentResolver().openInputStream(uri)){
+			try(InputStream in= MusktodonApp.context.getContentResolver().openInputStream(uri)){
 				BitmapFactory.decodeStream(in, null, opts);
 			}
-			contentType=MastodonApp.context.getContentResolver().getType(uri);
+			contentType= MusktodonApp.context.getContentResolver().getType(uri);
 		}
 		if(TextUtils.isEmpty(contentType))
 			contentType="image/jpeg";
@@ -58,7 +57,7 @@ public class ResizedImageRequestBody extends CountingRequestBody{
 				if("file".equals(uri.getScheme())){
 					source=ImageDecoder.createSource(new File(uri.getPath()));
 				}else{
-					source=ImageDecoder.createSource(MastodonApp.context.getContentResolver(), uri);
+					source=ImageDecoder.createSource(MusktodonApp.context.getContentResolver(), uri);
 				}
 				bitmap=ImageDecoder.decodeBitmap(source, (decoder, info, _source)->{
 					int[] size=getTargetSize(info.getSize().getWidth(), info.getSize().getHeight());
@@ -82,7 +81,7 @@ public class ResizedImageRequestBody extends CountingRequestBody{
 				if("file".equals(uri.getScheme())){
 					bitmap=BitmapFactory.decodeFile(uri.getPath(), opts);
 				}else{
-					try(InputStream in=MastodonApp.context.getContentResolver().openInputStream(uri)){
+					try(InputStream in= MusktodonApp.context.getContentResolver().openInputStream(uri)){
 						bitmap=BitmapFactory.decodeStream(in, null, opts);
 					}
 				}
@@ -111,7 +110,7 @@ public class ResizedImageRequestBody extends CountingRequestBody{
 					ExifInterface exif=new ExifInterface(uri.getPath());
 					orientation=exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
 				}else if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.N){
-					try(InputStream in=MastodonApp.context.getContentResolver().openInputStream(uri)){
+					try(InputStream in= MusktodonApp.context.getContentResolver().openInputStream(uri)){
 						ExifInterface exif=new ExifInterface(in);
 						orientation=exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
 					}
@@ -144,7 +143,7 @@ public class ResizedImageRequestBody extends CountingRequestBody{
 			if("file".equals(uri.getScheme())){
 				length=new File(uri.getPath()).length();
 			}else{
-				try(Cursor cursor=MastodonApp.context.getContentResolver().query(uri, new String[]{OpenableColumns.SIZE}, null, null, null)){
+				try(Cursor cursor= MusktodonApp.context.getContentResolver().query(uri, new String[]{OpenableColumns.SIZE}, null, null, null)){
 					cursor.moveToFirst();
 					length=cursor.getInt(0);
 				}
@@ -155,7 +154,7 @@ public class ResizedImageRequestBody extends CountingRequestBody{
 	@Override
 	protected Source openSource() throws IOException{
 		if(tempFile==null){
-			return Okio.source(MastodonApp.context.getContentResolver().openInputStream(uri));
+			return Okio.source(MusktodonApp.context.getContentResolver().openInputStream(uri));
 		}else{
 			return Okio.source(tempFile);
 		}

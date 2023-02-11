@@ -2,6 +2,7 @@ package org.joinmastodon.android.model;
 
 import android.text.SpannableStringBuilder;
 
+import org.joinmastodon.android.MusktodonApp;
 import org.joinmastodon.android.data.GlobalUserPreferences;
 import org.joinmastodon.android.data.GlobalUserPreferencesDataSource;
 import org.joinmastodon.android.ui.text.HtmlParser;
@@ -22,7 +23,7 @@ public class ParsedAccount{
 	private GlobalUserPreferencesDataSource globalUserPreferencesDataSource;
 
 	public ParsedAccount(Account account, String accountID){
-		this.globalUserPreferencesDataSource = new GlobalUserPreferences();
+		this.globalUserPreferencesDataSource = new GlobalUserPreferences(MusktodonApp.context);
 		this.account=account;
 		parsedName=HtmlParser.parseCustomEmoji(account.displayName, account.emojis);
 		parsedBio=HtmlParser.parse(account.note, account.emojis, Collections.emptyList(), Collections.emptyList(), accountID);

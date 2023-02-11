@@ -37,7 +37,7 @@ import android.widget.Toast;
 
 import org.joinmastodon.android.E;
 import org.joinmastodon.android.data.GlobalUserPreferences;
-import org.joinmastodon.android.MastodonApp;
+import org.joinmastodon.android.MusktodonApp;
 import org.joinmastodon.android.R;
 import org.joinmastodon.android.api.requests.accounts.SetAccountBlocked;
 import org.joinmastodon.android.api.requests.accounts.SetAccountFollowed;
@@ -95,7 +95,7 @@ public class UiUtils {
     private static final DateTimeFormatter DATE_FORMATTER_SHORT_WITH_YEAR = DateTimeFormatter.ofPattern("d MMM uuuu"), DATE_FORMATTER_SHORT = DateTimeFormatter.ofPattern("d MMM");
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG, FormatStyle.SHORT);
 
-    private static GlobalUserPreferencesDataSource globalUserPreferencesDataSource = new GlobalUserPreferences();
+    private static GlobalUserPreferencesDataSource globalUserPreferencesDataSource = new GlobalUserPreferences(MusktodonApp.context);
 
     private UiUtils() {
     }
@@ -238,7 +238,7 @@ public class UiUtils {
 
     public static String getFileName(Uri uri) {
         if (uri.getScheme().equals("content")) {
-            try (Cursor cursor = MastodonApp.context.getContentResolver().query(uri, new String[]{OpenableColumns.DISPLAY_NAME}, null, null, null)) {
+            try (Cursor cursor = MusktodonApp.context.getContentResolver().query(uri, new String[]{OpenableColumns.DISPLAY_NAME}, null, null, null)) {
                 cursor.moveToFirst();
                 String name = cursor.getString(0);
                 if (name != null)
@@ -602,7 +602,7 @@ public class UiUtils {
 
     public static boolean isDarkTheme() {
         if (UiUtils.globalUserPreferencesDataSource.getTheme() == ThemePreference.AUTO)
-            return (MastodonApp.context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
+            return (MusktodonApp.context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
         return UiUtils.globalUserPreferencesDataSource.getTheme() == ThemePreference.DARK;
     }
 

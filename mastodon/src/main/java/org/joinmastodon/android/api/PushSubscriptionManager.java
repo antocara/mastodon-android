@@ -11,7 +11,7 @@ import android.util.Base64;
 import android.util.Log;
 
 import org.joinmastodon.android.BuildConfig;
-import org.joinmastodon.android.MastodonApp;
+import org.joinmastodon.android.MusktodonApp;
 import org.joinmastodon.android.api.requests.notifications.RegisterForPushNotifications;
 import org.joinmastodon.android.api.requests.notifications.UpdatePushSettings;
 import org.joinmastodon.android.api.session.AccountSession;
@@ -45,7 +45,6 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyAgreement;
 import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -105,16 +104,16 @@ public class PushSubscriptionManager{
 		Intent intent = new Intent("com.google.iid.TOKEN_REQUEST");
 		intent.setPackage(GSF_PACKAGE);
 		intent.putExtra(EXTRA_APPLICATION_PENDING_INTENT,
-				PendingIntent.getBroadcast(MastodonApp.context, 0, new Intent(), PendingIntent.FLAG_IMMUTABLE));
+				PendingIntent.getBroadcast(MusktodonApp.context, 0, new Intent(), PendingIntent.FLAG_IMMUTABLE));
 		intent.putExtra(EXTRA_SENDER, FCM_SENDER_ID);
 		intent.putExtra(EXTRA_SUBTYPE, FCM_SENDER_ID);
 		intent.putExtra(EXTRA_SCOPE, "*");
 		intent.putExtra("kid", KID_VALUE);
-		MastodonApp.context.sendBroadcast(intent);
+		MusktodonApp.context.sendBroadcast(intent);
 	}
 
 	private static SharedPreferences getPrefs(){
-		return MastodonApp.context.getSharedPreferences("push", Context.MODE_PRIVATE);
+		return MusktodonApp.context.getSharedPreferences("push", Context.MODE_PRIVATE);
 	}
 
 	public static boolean arePushNotificationsAvailable(){

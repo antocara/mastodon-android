@@ -32,7 +32,7 @@ import org.joinmastodon.android.BuildConfig;
 import org.joinmastodon.android.E;
 import org.joinmastodon.android.data.GlobalUserPreferences;
 import org.joinmastodon.android.MainActivity;
-import org.joinmastodon.android.MastodonApp;
+import org.joinmastodon.android.MusktodonApp;
 import org.joinmastodon.android.R;
 import org.joinmastodon.android.api.MastodonAPIController;
 import org.joinmastodon.android.api.PushSubscriptionManager;
@@ -83,7 +83,7 @@ public class SettingsFragment extends MastodonToolbarFragment{
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		this.globalUserPreferencesDataSource = new GlobalUserPreferences();
+		this.globalUserPreferencesDataSource = new GlobalUserPreferences(MusktodonApp.context);
 		if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.N)
 			setRetainInstance(true);
 		setTitle(R.string.settings);
@@ -150,7 +150,7 @@ public class SettingsFragment extends MastodonToolbarFragment{
 		super.onAttach(activity);
 		if(themeTransitionWindowView!=null){
 			// Activity has finished recreating. Remove the overlay.
-			MastodonApp.context.getSystemService(WindowManager.class).removeView(themeTransitionWindowView);
+			MusktodonApp.context.getSystemService(WindowManager.class).removeView(themeTransitionWindowView);
 			themeTransitionWindowView=null;
 		}
 	}
@@ -234,7 +234,7 @@ public class SettingsFragment extends MastodonToolbarFragment{
 			View activityDecorView=getActivity().getWindow().getDecorView();
 			Bitmap bitmap=Bitmap.createBitmap(activityDecorView.getWidth(), activityDecorView.getHeight(), Bitmap.Config.ARGB_8888);
 			activityDecorView.draw(new Canvas(bitmap));
-			themeTransitionWindowView=new ImageView(MastodonApp.context);
+			themeTransitionWindowView=new ImageView(MusktodonApp.context);
 			themeTransitionWindowView.setImageBitmap(bitmap);
 			WindowManager.LayoutParams lp=new WindowManager.LayoutParams(WindowManager.LayoutParams.TYPE_APPLICATION);
 			lp.flags=WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE |
@@ -244,7 +244,7 @@ public class SettingsFragment extends MastodonToolbarFragment{
 			lp.width=lp.height=WindowManager.LayoutParams.MATCH_PARENT;
 			lp.token=getActivity().getWindow().getAttributes().token;
 			lp.windowAnimations=R.style.window_fade_out;
-			MastodonApp.context.getSystemService(WindowManager.class).addView(themeTransitionWindowView, lp);
+			MusktodonApp.context.getSystemService(WindowManager.class).addView(themeTransitionWindowView, lp);
 		}
 		getActivity().recreate();
 	}

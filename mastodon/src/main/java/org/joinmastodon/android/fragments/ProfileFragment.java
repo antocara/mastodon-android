@@ -39,6 +39,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
+import org.joinmastodon.android.MusktodonApp;
 import org.joinmastodon.android.data.GlobalUserPreferences;
 import org.joinmastodon.android.R;
 import org.joinmastodon.android.api.requests.accounts.GetAccountByID;
@@ -134,7 +135,7 @@ public class ProfileFragment extends LoaderFragment implements OnBackPressedList
 	private PhotoViewer currentPhotoViewer;
 	private boolean editModeLoading;
 
-	private GlobalUserPreferencesDataSource globalUserPreferencesDataSource = new GlobalUserPreferences();
+	private GlobalUserPreferencesDataSource globalUserPreferencesDataSource = new GlobalUserPreferences(MusktodonApp.context);
 
 	public ProfileFragment(){
 		super(R.layout.loader_fragment_overlay_toolbar);

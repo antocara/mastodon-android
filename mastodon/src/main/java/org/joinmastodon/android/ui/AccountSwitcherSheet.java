@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import org.joinmastodon.android.MusktodonApp;
 import org.joinmastodon.android.data.GlobalUserPreferences;
 import org.joinmastodon.android.MainActivity;
 import org.joinmastodon.android.R;
@@ -241,7 +242,7 @@ public class AccountSwitcherSheet extends BottomSheet{
 
 		private GlobalUserPreferencesDataSource globalUserPreferencesDataSource;
 		public WrappedAccount(AccountSession session){
-			this.globalUserPreferencesDataSource = new GlobalUserPreferences();
+			this.globalUserPreferencesDataSource = new GlobalUserPreferences(MusktodonApp.context);
 			this.session=session;
 			if(session.self.avatar!=null)
 				req=new UrlImageLoaderRequest(globalUserPreferencesDataSource.getPlayGifs() ? session.self.avatar : session.self.avatarStatic, V.dp(50), V.dp(50));
