@@ -1,4 +1,6 @@
-Mastodon for Android
+[![Android CI](https://github.com/antocara/musktodon/actions/workflows/android.yml/badge.svg)](https://github.com/antocara/musktodon/actions/workflows/pr_merge.yml)
+
+Musktodon for Android
 ======================
 
 
