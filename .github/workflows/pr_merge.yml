@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 17
-            -
+            
       # Step 2: Adding secrets
       - name: Adding secrets
         run: |
