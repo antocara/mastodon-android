@@ -12,7 +12,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.joinmastodon.android.E;
+import org.joinmastodon.android.data.eventbus.EventBus;
 import org.joinmastodon.android.R;
 import org.joinmastodon.android.fragments.MastodonToolbarFragment;
 import org.joinmastodon.android.model.Account;
@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import me.grishka.appkit.fragments.ToolbarFragment;
+
 import me.grishka.appkit.utils.BindableViewHolder;
 import me.grishka.appkit.utils.MergeRecyclerAdapter;
 import me.grishka.appkit.utils.SingleViewRecyclerAdapter;
@@ -49,12 +49,12 @@ public abstract class BaseReportChoiceFragment extends MastodonToolbarFragment{
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
-		E.register(this);
+		EventBus.INSTANCE.register(this);
 	}
 
 	@Override
 	public void onDestroy(){
-		E.unregister(this);
+		EventBus.INSTANCE.unregister(this);
 		super.onDestroy();
 	}
 

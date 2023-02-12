@@ -29,8 +29,8 @@ import android.widget.Toast;
 import com.squareup.otto.Subscribe;
 
 import org.joinmastodon.android.BuildConfig;
-import org.joinmastodon.android.E;
-import org.joinmastodon.android.data.GlobalUserPreferences;
+import org.joinmastodon.android.data.eventbus.EventBus;
+import org.joinmastodon.android.data.userpreferences.GlobalUserPreferences;
 import org.joinmastodon.android.MainActivity;
 import org.joinmastodon.android.MusktodonApp;
 import org.joinmastodon.android.R;
@@ -40,8 +40,8 @@ import org.joinmastodon.android.api.requests.oauth.RevokeOauthToken;
 import org.joinmastodon.android.api.session.AccountActivationInfo;
 import org.joinmastodon.android.api.session.AccountSession;
 import org.joinmastodon.android.api.session.AccountSessionManager;
-import org.joinmastodon.android.data.GlobalUserPreferencesDataSource;
-import org.joinmastodon.android.data.ThemePreference;
+import org.joinmastodon.android.data.userpreferences.GlobalUserPreferencesDataSource;
+import org.joinmastodon.android.data.userpreferences.ThemePreference;
 import org.joinmastodon.android.events.SelfUpdateStateChangedEvent;
 import org.joinmastodon.android.fragments.onboarding.AccountActivationFragment;
 import org.joinmastodon.android.model.PushNotification;
@@ -196,14 +196,14 @@ public class SettingsFragment extends MastodonToolbarFragment{
 	public void onViewCreated(View view, Bundle savedInstanceState){
 		super.onViewCreated(view, savedInstanceState);
 		if(GithubSelfUpdater.needSelfUpdating())
-			E.register(this);
+			EventBus.INSTANCE.register(this);
 	}
 
 	@Override
 	public void onDestroyView(){
 		super.onDestroyView();
 		if(GithubSelfUpdater.needSelfUpdating())
-			E.unregister(this);
+			EventBus.INSTANCE.unregister(this);
 	}
 
 	private void onThemePreferenceClick(ThemePreference theme){

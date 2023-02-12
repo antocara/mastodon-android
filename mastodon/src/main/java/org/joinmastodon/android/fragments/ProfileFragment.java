@@ -40,7 +40,7 @@ import android.widget.Toast;
 import android.widget.Toolbar;
 
 import org.joinmastodon.android.MusktodonApp;
-import org.joinmastodon.android.data.GlobalUserPreferences;
+import org.joinmastodon.android.data.userpreferences.GlobalUserPreferences;
 import org.joinmastodon.android.R;
 import org.joinmastodon.android.api.requests.accounts.GetAccountByID;
 import org.joinmastodon.android.api.requests.accounts.GetAccountRelationships;
@@ -49,7 +49,7 @@ import org.joinmastodon.android.api.requests.accounts.GetOwnAccount;
 import org.joinmastodon.android.api.requests.accounts.SetAccountFollowed;
 import org.joinmastodon.android.api.requests.accounts.UpdateAccountCredentials;
 import org.joinmastodon.android.api.session.AccountSessionManager;
-import org.joinmastodon.android.data.GlobalUserPreferencesDataSource;
+import org.joinmastodon.android.data.userpreferences.GlobalUserPreferencesDataSource;
 import org.joinmastodon.android.fragments.account_list.FollowerListFragment;
 import org.joinmastodon.android.fragments.account_list.FollowingListFragment;
 import org.joinmastodon.android.fragments.report.ReportReasonChoiceFragment;

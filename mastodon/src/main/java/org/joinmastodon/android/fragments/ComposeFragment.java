@@ -53,7 +53,7 @@ import android.widget.Toast;
 
 import com.twitter.twittertext.TwitterTextEmojiRegex;
 
-import org.joinmastodon.android.E;
+import org.joinmastodon.android.data.eventbus.EventBus;
 import org.joinmastodon.android.MusktodonApp;
 import org.joinmastodon.android.R;
 import org.joinmastodon.android.api.MastodonAPIController;
@@ -698,13 +698,13 @@ public class ComposeFragment extends MastodonToolbarFragment implements OnBackPr
 				wm.removeView(sendingOverlay);
 				sendingOverlay=null;
 				if(editingStatus==null){
-					E.post(new StatusCreatedEvent(result, accountID));
+					EventBus.INSTANCE.post(new StatusCreatedEvent(result, accountID));
 					if(replyTo!=null){
 						replyTo.repliesCount++;
-						E.post(new StatusCountersUpdatedEvent(replyTo));
+						EventBus.INSTANCE.post(new StatusCountersUpdatedEvent(replyTo));
 					}
 				}else{
-					E.post(new StatusUpdatedEvent(result));
+					EventBus.INSTANCE.post(new StatusUpdatedEvent(result));
 				}
 				Nav.finish(ComposeFragment.this);
 			}

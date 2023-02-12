@@ -20,12 +20,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.joinmastodon.android.MusktodonApp;
-import org.joinmastodon.android.data.GlobalUserPreferences;
+import org.joinmastodon.android.data.userpreferences.GlobalUserPreferences;
 import org.joinmastodon.android.R;
 import org.joinmastodon.android.api.requests.accounts.GetAccountRelationships;
 import org.joinmastodon.android.api.requests.statuses.GetStatusSourceText;
 import org.joinmastodon.android.api.session.AccountSessionManager;
-import org.joinmastodon.android.data.GlobalUserPreferencesDataSource;
+import org.joinmastodon.android.data.userpreferences.GlobalUserPreferencesDataSource;
 import org.joinmastodon.android.fragments.BaseStatusListFragment;
 import org.joinmastodon.android.fragments.ComposeFragment;
 import org.joinmastodon.android.fragments.ProfileFragment;

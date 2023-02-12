@@ -13,7 +13,7 @@ import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
 
-import org.joinmastodon.android.E;
+import org.joinmastodon.android.data.eventbus.EventBus;
 import org.joinmastodon.android.R;
 import org.joinmastodon.android.api.requests.reports.SendReport;
 import org.joinmastodon.android.events.FinishReportFragmentsEvent;
@@ -41,12 +41,12 @@ public class ReportCommentFragment extends MastodonToolbarFragment{
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
-		E.register(this);
+		EventBus.INSTANCE.register(this);
 	}
 
 	@Override
 	public void onDestroy(){
-		E.unregister(this);
+		EventBus.INSTANCE.unregister(this);
 		super.onDestroy();
 	}
 
@@ -110,7 +110,7 @@ public class ReportCommentFragment extends MastodonToolbarFragment{
 						args.putParcelable("reportAccount", Parcels.wrap(reportAccount));
 						args.putString("reason", reason.name());
 						Nav.go(getActivity(), ReportDoneFragment.class, args);
-						buttonBar.postDelayed(()->E.post(new FinishReportFragmentsEvent(reportAccount.id)), 500);
+						buttonBar.postDelayed(()-> EventBus.INSTANCE.post(new FinishReportFragmentsEvent(reportAccount.id)), 500);
 					}
 
 					@Override

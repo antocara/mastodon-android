@@ -19,10 +19,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import org.joinmastodon.android.BuildConfig;
-import org.joinmastodon.android.E;
 import org.joinmastodon.android.MusktodonApp;
 import org.joinmastodon.android.R;
 import org.joinmastodon.android.api.MastodonAPIController;
+import org.joinmastodon.android.data.eventbus.EventBus;
 import org.joinmastodon.android.events.SelfUpdateStateChangedEvent;
 
 import java.io.File;
@@ -30,183 +30,184 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import androidx.annotation.Keep;
+
 import okhttp3.Call;
 import okhttp3.Request;
 import okhttp3.Response;
 
 @Keep
-public class GithubSelfUpdaterImpl extends GithubSelfUpdater{
-	private static final long CHECK_PERIOD=24*3600*1000L;
-	private static final String TAG="GithubSelfUpdater";
+public class GithubSelfUpdaterImpl extends GithubSelfUpdater {
+    private static final long CHECK_PERIOD = 24 * 3600 * 1000L;
+    private static final String TAG = "GithubSelfUpdater";
 
-	private UpdateState state=UpdateState.NO_UPDATE;
-	private UpdateInfo info;
-	private long downloadID;
-	private BroadcastReceiver downloadCompletionReceiver=new BroadcastReceiver(){
-		@Override
-		public void onReceive(Context context, Intent intent){
-			if(downloadID!=0 && intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0)==downloadID){
-				MusktodonApp.context.unregisterReceiver(this);
-				setState(UpdateState.DOWNLOADED);
-			}
-		}
-	};
+    private UpdateState state = UpdateState.NO_UPDATE;
+    private UpdateInfo info;
+    private long downloadID;
+    private BroadcastReceiver downloadCompletionReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (downloadID != 0 && intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0) == downloadID) {
+                MusktodonApp.context.unregisterReceiver(this);
+                setState(UpdateState.DOWNLOADED);
+            }
+        }
+    };
 
-	public GithubSelfUpdaterImpl(){
-		SharedPreferences prefs=getPrefs();
-		int checkedByBuild=prefs.getInt("checkedByBuild", 0);
-		if(prefs.contains("version") && checkedByBuild==BuildConfig.VERSION_CODE){
-			info=new UpdateInfo();
-			info.version=prefs.getString("version", null);
-			info.size=prefs.getLong("apkSize", 0);
-			downloadID=prefs.getLong("downloadID", 0);
-			if(downloadID==0 || !getUpdateApkFile().exists()){
-				state=UpdateState.UPDATE_AVAILABLE;
-			}else{
-				DownloadManager dm=MusktodonApp.context.getSystemService(DownloadManager.class);
-				state=dm.getUriForDownloadedFile(downloadID)==null ? UpdateState.DOWNLOADING : UpdateState.DOWNLOADED;
-				if(state==UpdateState.DOWNLOADING){
-					MusktodonApp.context.registerReceiver(downloadCompletionReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-				}
-			}
-		}else if(checkedByBuild!=BuildConfig.VERSION_CODE && checkedByBuild>0){
-			// We are in a new version, running for the first time after update. Gotta clean things up.
-			long id=getPrefs().getLong("downloadID", 0);
-			if(id!=0){
-				MusktodonApp.context.getSystemService(DownloadManager.class).remove(id);
-			}
-			getUpdateApkFile().delete();
-			getPrefs().edit()
-					.remove("apkSize")
-					.remove("version")
-					.remove("apkURL")
-					.remove("checkedByBuild")
-					.remove("downloadID")
-					.apply();
-		}
-	}
+    public GithubSelfUpdaterImpl() {
+        SharedPreferences prefs = getPrefs();
+        int checkedByBuild = prefs.getInt("checkedByBuild", 0);
+        if (prefs.contains("version") && checkedByBuild == BuildConfig.VERSION_CODE) {
+            info = new UpdateInfo();
+            info.version = prefs.getString("version", null);
+            info.size = prefs.getLong("apkSize", 0);
+            downloadID = prefs.getLong("downloadID", 0);
+            if (downloadID == 0 || !getUpdateApkFile().exists()) {
+                state = UpdateState.UPDATE_AVAILABLE;
+            } else {
+                DownloadManager dm = MusktodonApp.context.getSystemService(DownloadManager.class);
+                state = dm.getUriForDownloadedFile(downloadID) == null ? UpdateState.DOWNLOADING : UpdateState.DOWNLOADED;
+                if (state == UpdateState.DOWNLOADING) {
+                    MusktodonApp.context.registerReceiver(downloadCompletionReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+                }
+            }
+        } else if (checkedByBuild != BuildConfig.VERSION_CODE && checkedByBuild > 0) {
+            // We are in a new version, running for the first time after update. Gotta clean things up.
+            long id = getPrefs().getLong("downloadID", 0);
+            if (id != 0) {
+                MusktodonApp.context.getSystemService(DownloadManager.class).remove(id);
+            }
+            getUpdateApkFile().delete();
+            getPrefs().edit()
+                    .remove("apkSize")
+                    .remove("version")
+                    .remove("apkURL")
+                    .remove("checkedByBuild")
+                    .remove("downloadID")
+                    .apply();
+        }
+    }
 
-	private SharedPreferences getPrefs(){
-		return MusktodonApp.context.getSharedPreferences("githubUpdater", Context.MODE_PRIVATE);
-	}
+    private SharedPreferences getPrefs() {
+        return MusktodonApp.context.getSharedPreferences("githubUpdater", Context.MODE_PRIVATE);
+    }
 
-	@Override
-	public void maybeCheckForUpdates(){
-		if(state!=UpdateState.NO_UPDATE && state!=UpdateState.UPDATE_AVAILABLE)
-			return;
-		long timeSinceLastCheck=System.currentTimeMillis()-getPrefs().getLong("lastCheck", 0);
-		if(timeSinceLastCheck>CHECK_PERIOD){
-			setState(UpdateState.CHECKING);
-			MastodonAPIController.runInBackground(this::actuallyCheckForUpdates);
-		}
-	}
+    @Override
+    public void maybeCheckForUpdates() {
+        if (state != UpdateState.NO_UPDATE && state != UpdateState.UPDATE_AVAILABLE)
+            return;
+        long timeSinceLastCheck = System.currentTimeMillis() - getPrefs().getLong("lastCheck", 0);
+        if (timeSinceLastCheck > CHECK_PERIOD) {
+            setState(UpdateState.CHECKING);
+            MastodonAPIController.runInBackground(this::actuallyCheckForUpdates);
+        }
+    }
 
-	private void actuallyCheckForUpdates(){
-		Request req=new Request.Builder()
-				.url("https://api.github.com/repos/mastodon/mastodon-android/releases/latest")
-				.build();
-		Call call=MastodonAPIController.getHttpClient().newCall(req);
-		try(Response resp=call.execute()){
-			JsonObject obj=JsonParser.parseReader(resp.body().charStream()).getAsJsonObject();
-			String tag=obj.get("tag_name").getAsString();
-			Pattern pattern=Pattern.compile("v?(\\d+)\\.(\\d+)\\.(\\d+)");
-			Matcher matcher=pattern.matcher(tag);
-			if(!matcher.find()){
-				Log.w(TAG, "actuallyCheckForUpdates: release tag has wrong format: "+tag);
-				return;
-			}
-			int newMajor=Integer.parseInt(matcher.group(1)), newMinor=Integer.parseInt(matcher.group(2)), newRevision=Integer.parseInt(matcher.group(3));
-			matcher=pattern.matcher(BuildConfig.VERSION_NAME);
-			if(!matcher.find()){
-				Log.w(TAG, "actuallyCheckForUpdates: current version has wrong format: "+BuildConfig.VERSION_NAME);
-				return;
-			}
-			int curMajor=Integer.parseInt(matcher.group(1)), curMinor=Integer.parseInt(matcher.group(2)), curRevision=Integer.parseInt(matcher.group(3));
-			long newVersion=((long)newMajor << 32) | ((long)newMinor << 16) | newRevision;
-			long curVersion=((long)curMajor << 32) | ((long)curMinor << 16) | curRevision;
-			if(newVersion>curVersion || BuildConfig.DEBUG){
-				String version=newMajor+"."+newMinor+"."+newRevision;
-				Log.d(TAG, "actuallyCheckForUpdates: new version: "+version);
-				for(JsonElement el:obj.getAsJsonArray("assets")){
-					JsonObject asset=el.getAsJsonObject();
-					if("application/vnd.android.package-archive".equals(asset.get("content_type").getAsString()) && "uploaded".equals(asset.get("state").getAsString())){
-						long size=asset.get("size").getAsLong();
-						String url=asset.get("browser_download_url").getAsString();
+    private void actuallyCheckForUpdates() {
+        Request req = new Request.Builder()
+                .url("https://api.github.com/repos/mastodon/mastodon-android/releases/latest")
+                .build();
+        Call call = MastodonAPIController.getHttpClient().newCall(req);
+        try (Response resp = call.execute()) {
+            JsonObject obj = JsonParser.parseReader(resp.body().charStream()).getAsJsonObject();
+            String tag = obj.get("tag_name").getAsString();
+            Pattern pattern = Pattern.compile("v?(\\d+)\\.(\\d+)\\.(\\d+)");
+            Matcher matcher = pattern.matcher(tag);
+            if (!matcher.find()) {
+                Log.w(TAG, "actuallyCheckForUpdates: release tag has wrong format: " + tag);
+                return;
+            }
+            int newMajor = Integer.parseInt(matcher.group(1)), newMinor = Integer.parseInt(matcher.group(2)), newRevision = Integer.parseInt(matcher.group(3));
+            matcher = pattern.matcher(BuildConfig.VERSION_NAME);
+            if (!matcher.find()) {
+                Log.w(TAG, "actuallyCheckForUpdates: current version has wrong format: " + BuildConfig.VERSION_NAME);
+                return;
+            }
+            int curMajor = Integer.parseInt(matcher.group(1)), curMinor = Integer.parseInt(matcher.group(2)), curRevision = Integer.parseInt(matcher.group(3));
+            long newVersion = ((long) newMajor << 32) | ((long) newMinor << 16) | newRevision;
+            long curVersion = ((long) curMajor << 32) | ((long) curMinor << 16) | curRevision;
+            if (newVersion > curVersion || BuildConfig.DEBUG) {
+                String version = newMajor + "." + newMinor + "." + newRevision;
+                Log.d(TAG, "actuallyCheckForUpdates: new version: " + version);
+                for (JsonElement el : obj.getAsJsonArray("assets")) {
+                    JsonObject asset = el.getAsJsonObject();
+                    if ("application/vnd.android.package-archive".equals(asset.get("content_type").getAsString()) && "uploaded".equals(asset.get("state").getAsString())) {
+                        long size = asset.get("size").getAsLong();
+                        String url = asset.get("browser_download_url").getAsString();
 
-						UpdateInfo info=new UpdateInfo();
-						info.size=size;
-						info.version=version;
-						this.info=info;
+                        UpdateInfo info = new UpdateInfo();
+                        info.size = size;
+                        info.version = version;
+                        this.info = info;
 
-						getPrefs().edit()
-								.putLong("apkSize", size)
-								.putString("version", version)
-								.putString("apkURL", url)
-								.putInt("checkedByBuild", BuildConfig.VERSION_CODE)
-								.remove("downloadID")
-								.apply();
+                        getPrefs().edit()
+                                .putLong("apkSize", size)
+                                .putString("version", version)
+                                .putString("apkURL", url)
+                                .putInt("checkedByBuild", BuildConfig.VERSION_CODE)
+                                .remove("downloadID")
+                                .apply();
 
-						break;
-					}
-				}
-			}
-			getPrefs().edit().putLong("lastCheck", System.currentTimeMillis()).apply();
-		}catch(Exception x){
-			Log.w(TAG, "actuallyCheckForUpdates", x);
-		}finally{
-			setState(info==null ? UpdateState.NO_UPDATE : UpdateState.UPDATE_AVAILABLE);
-		}
-	}
+                        break;
+                    }
+                }
+            }
+            getPrefs().edit().putLong("lastCheck", System.currentTimeMillis()).apply();
+        } catch (Exception x) {
+            Log.w(TAG, "actuallyCheckForUpdates", x);
+        } finally {
+            setState(info == null ? UpdateState.NO_UPDATE : UpdateState.UPDATE_AVAILABLE);
+        }
+    }
 
-	private void setState(UpdateState state){
-		this.state=state;
-		E.post(new SelfUpdateStateChangedEvent(state));
-	}
+    private void setState(UpdateState state) {
+        this.state = state;
+        EventBus.INSTANCE.post(new SelfUpdateStateChangedEvent(state));
+    }
 
-	@Override
-	public UpdateState getState(){
-		return state;
-	}
+    @Override
+    public UpdateState getState() {
+        return state;
+    }
 
-	@Override
-	public UpdateInfo getUpdateInfo(){
-		return info;
-	}
+    @Override
+    public UpdateInfo getUpdateInfo() {
+        return info;
+    }
 
-	public File getUpdateApkFile(){
-		return new File(MusktodonApp.context.getExternalCacheDir(), "update.apk");
-	}
+    public File getUpdateApkFile() {
+        return new File(MusktodonApp.context.getExternalCacheDir(), "update.apk");
+    }
 
-	@Override
-	public void downloadUpdate(){
-		if(state==UpdateState.DOWNLOADING)
-			throw new IllegalStateException();
-		DownloadManager dm=MusktodonApp.context.getSystemService(DownloadManager.class);
-		MusktodonApp.context.registerReceiver(downloadCompletionReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-		downloadID=dm.enqueue(
-				new DownloadManager.Request(Uri.parse(getPrefs().getString("apkURL", null)))
-						.setDestinationUri(Uri.fromFile(getUpdateApkFile()))
-		);
-		getPrefs().edit().putLong("downloadID", downloadID).apply();
-		setState(UpdateState.DOWNLOADING);
-	}
+    @Override
+    public void downloadUpdate() {
+        if (state == UpdateState.DOWNLOADING)
+            throw new IllegalStateException();
+        DownloadManager dm = MusktodonApp.context.getSystemService(DownloadManager.class);
+        MusktodonApp.context.registerReceiver(downloadCompletionReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+        downloadID = dm.enqueue(
+                new DownloadManager.Request(Uri.parse(getPrefs().getString("apkURL", null)))
+                        .setDestinationUri(Uri.fromFile(getUpdateApkFile()))
+        );
+        getPrefs().edit().putLong("downloadID", downloadID).apply();
+        setState(UpdateState.DOWNLOADING);
+    }
 
-	@Override
-	public void installUpdate(Activity activity){
-		if(state!=UpdateState.DOWNLOADED)
-			throw new IllegalStateException();
-		Uri uri;
-		Intent intent=new Intent(Intent.ACTION_INSTALL_PACKAGE);
-		if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.N){
-			uri=new Uri.Builder().scheme("content").authority(activity.getPackageName()+".self_update_provider").path("update.apk").build();
-			intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-		}else{
-			uri=Uri.fromFile(getUpdateApkFile());
-		}
-		intent.setDataAndType(uri, "application/vnd.android.package-archive");
-		activity.startActivity(intent);
+    @Override
+    public void installUpdate(Activity activity) {
+        if (state != UpdateState.DOWNLOADED)
+            throw new IllegalStateException();
+        Uri uri;
+        Intent intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            uri = new Uri.Builder().scheme("content").authority(activity.getPackageName() + ".self_update_provider").path("update.apk").build();
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        } else {
+            uri = Uri.fromFile(getUpdateApkFile());
+        }
+        intent.setDataAndType(uri, "application/vnd.android.package-archive");
+        activity.startActivity(intent);
 
-		// TODO figure out how to restart the app when updating via this new API
+        // TODO figure out how to restart the app when updating via this new API
 		/*
 		PackageInstaller installer=activity.getPackageManager().getPackageInstaller();
 		try{
@@ -254,46 +255,46 @@ public class GithubSelfUpdaterImpl extends GithubSelfUpdater{
 			Toast.makeText(activity, x.getMessage(), Toast.LENGTH_SHORT).show();
 		}
 		 */
-	}
+    }
 
-	@Override
-	public float getDownloadProgress(){
-		if(state!=UpdateState.DOWNLOADING)
-			throw new IllegalStateException();
-		DownloadManager dm=MusktodonApp.context.getSystemService(DownloadManager.class);
-		try(Cursor cursor=dm.query(new DownloadManager.Query().setFilterById(downloadID))){
-			if(cursor.moveToFirst()){
-				long loaded=cursor.getLong(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
-				long total=cursor.getLong(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+    @Override
+    public float getDownloadProgress() {
+        if (state != UpdateState.DOWNLOADING)
+            throw new IllegalStateException();
+        DownloadManager dm = MusktodonApp.context.getSystemService(DownloadManager.class);
+        try (Cursor cursor = dm.query(new DownloadManager.Query().setFilterById(downloadID))) {
+            if (cursor.moveToFirst()) {
+                long loaded = cursor.getLong(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+                long total = cursor.getLong(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
 //				Log.d(TAG, "getDownloadProgress: "+loaded+" of "+total);
-				return total>0 ? (float)loaded/total : 0f;
-			}
-		}
-		return 0;
-	}
+                return total > 0 ? (float) loaded / total : 0f;
+            }
+        }
+        return 0;
+    }
 
-	@Override
-	public void cancelDownload(){
-		if(state!=UpdateState.DOWNLOADING)
-			throw new IllegalStateException();
-		DownloadManager dm=MusktodonApp.context.getSystemService(DownloadManager.class);
-		dm.remove(downloadID);
-		downloadID=0;
-		getPrefs().edit().remove("downloadID").apply();
-		setState(UpdateState.UPDATE_AVAILABLE);
-	}
+    @Override
+    public void cancelDownload() {
+        if (state != UpdateState.DOWNLOADING)
+            throw new IllegalStateException();
+        DownloadManager dm = MusktodonApp.context.getSystemService(DownloadManager.class);
+        dm.remove(downloadID);
+        downloadID = 0;
+        getPrefs().edit().remove("downloadID").apply();
+        setState(UpdateState.UPDATE_AVAILABLE);
+    }
 
-	@Override
-	public void handleIntentFromInstaller(Intent intent, Activity activity){
-		int status=intent.getIntExtra(PackageInstaller.EXTRA_STATUS, 0);
-		if(status==PackageInstaller.STATUS_PENDING_USER_ACTION){
-			Intent confirmIntent=intent.getParcelableExtra(Intent.EXTRA_INTENT);
-			activity.startActivity(confirmIntent);
-		}else if(status!=PackageInstaller.STATUS_SUCCESS){
-			String msg=intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE);
-			Toast.makeText(activity, activity.getString(R.string.error)+":\n"+msg, Toast.LENGTH_LONG).show();
-		}
-	}
+    @Override
+    public void handleIntentFromInstaller(Intent intent, Activity activity) {
+        int status = intent.getIntExtra(PackageInstaller.EXTRA_STATUS, 0);
+        if (status == PackageInstaller.STATUS_PENDING_USER_ACTION) {
+            Intent confirmIntent = intent.getParcelableExtra(Intent.EXTRA_INTENT);
+            activity.startActivity(confirmIntent);
+        } else if (status != PackageInstaller.STATUS_SUCCESS) {
+            String msg = intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE);
+            Toast.makeText(activity, activity.getString(R.string.error) + ":\n" + msg, Toast.LENGTH_LONG).show();
+        }
+    }
 
 	/*public static class InstallerStatusReceiver extends BroadcastReceiver{
 

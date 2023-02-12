@@ -23,7 +23,7 @@ import android.widget.Toolbar;
 
 import com.squareup.otto.Subscribe;
 
-import org.joinmastodon.android.E;
+import org.joinmastodon.android.data.eventbus.EventBus;
 import org.joinmastodon.android.R;
 import org.joinmastodon.android.api.requests.markers.SaveMarkers;
 import org.joinmastodon.android.api.requests.timelines.GetHomeTimeline;
@@ -108,7 +108,7 @@ public class HomeTimelineFragment extends StatusListFragment{
 		});
 
 		if(GithubSelfUpdater.needSelfUpdating()){
-			E.register(this);
+			EventBus.INSTANCE.register(this);
 			updateUpdateState(GithubSelfUpdater.getInstance().getState());
 		}
 	}
@@ -434,7 +434,7 @@ public class HomeTimelineFragment extends StatusListFragment{
 	public void onDestroyView(){
 		super.onDestroyView();
 		if(GithubSelfUpdater.needSelfUpdating()){
-			E.unregister(this);
+			EventBus.INSTANCE.unregister(this);
 		}
 	}
 

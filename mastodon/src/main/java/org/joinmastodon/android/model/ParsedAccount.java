@@ -3,8 +3,8 @@ package org.joinmastodon.android.model;
 import android.text.SpannableStringBuilder;
 
 import org.joinmastodon.android.MusktodonApp;
-import org.joinmastodon.android.data.GlobalUserPreferences;
-import org.joinmastodon.android.data.GlobalUserPreferencesDataSource;
+import org.joinmastodon.android.data.userpreferences.GlobalUserPreferences;
+import org.joinmastodon.android.data.userpreferences.GlobalUserPreferencesDataSource;
 import org.joinmastodon.android.ui.text.HtmlParser;
 import org.joinmastodon.android.ui.utils.CustomEmojiHelper;
 

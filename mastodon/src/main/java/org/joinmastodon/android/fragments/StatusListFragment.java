@@ -4,7 +4,7 @@ import android.os.Bundle;
 
 import com.squareup.otto.Subscribe;
 
-import org.joinmastodon.android.E;
+import org.joinmastodon.android.data.eventbus.EventBus;
 import org.joinmastodon.android.events.PollUpdatedEvent;
 import org.joinmastodon.android.events.RemoveAccountPostsEvent;
 import org.joinmastodon.android.events.StatusCountersUpdatedEvent;
@@ -41,13 +41,13 @@ public abstract class StatusListFragment extends BaseStatusListFragment<Status>{
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		E.register(eventListener);
+		EventBus.INSTANCE.register(eventListener);
 	}
 
 	@Override
 	public void onDestroy(){
 		super.onDestroy();
-		E.unregister(eventListener);
+		EventBus.INSTANCE.unregister(eventListener);
 	}
 
 	@Override

@@ -8,6 +8,7 @@ import me.grishka.appkit.utils.NetworkUtils
 import me.grishka.appkit.utils.V
 import org.joinmastodon.android.api.PushSubscriptionManager
 import org.joinmastodon.android.di.dataModules
+import org.joinmastodon.android.di.viewModels
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -36,7 +37,7 @@ class MusktodonApp : Application() {
         startKoin {
             androidLogger()
             androidContext(this@MusktodonApp)
-            modules(dataModules)
+            modules(viewModels + dataModules)
         }
     }
 }
