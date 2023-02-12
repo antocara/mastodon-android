@@ -3,7 +3,7 @@ package org.joinmastodon.android.data.network
 import okhttp3.OkHttpClient
 import org.joinmastodon.android.data.network.interceptors.NetworkInterceptor
 
-class ClientOkHttp {
+class OkHttpClientBuilder {
     companion object {
         fun build(interceptors: List<NetworkInterceptor>? = emptyList()): OkHttpClient {
             return OkHttpClient.Builder()
