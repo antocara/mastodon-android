@@ -46,7 +46,7 @@
         </activity>
         <activity
             android:theme="@style/Theme.AppCompat"
-            android:name=".OAuthActivity"
+            android:name=".features.oauth.OAuthActivity"
             android:configChanges="orientation|screenSize"
             android:exported="true"
             android:launchMode="singleTask">

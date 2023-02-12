@@ -5,6 +5,8 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import me.grishka.appkit.api.Callback
 import me.grishka.appkit.api.ErrorResponse
 import org.joinmastodon.android.api.requests.accounts.GetOwnAccount
@@ -17,38 +19,44 @@ import org.joinmastodon.android.model.Token
 
 class OauthRepository(private val accountSessionManager: AccountSessionManager) : OauthDataSource {
 
-    override suspend fun getOauthToken(code: String): Boolean {
+    override suspend fun getOauthToken(code: String): Flow<Boolean> {
 
-        return suspendCoroutine { continuation ->
-            obtainDataSession()?.let {
-                handleGetToken(dataSession = it, code, continuation)
-            } ?: continuation.resumeWithException(NetworkErrorException())
+        return flow {
+            runCatching {
+                obtainDataSession()?.let {
+                    val token = handleGetToken(dataSession = it, code)
+                    emit(token)
+                } ?: emit(false)
+            }.getOrElse {
+                emit(false)
+            }
         }
     }
 
-    private fun handleGetToken(
+    private suspend fun handleGetToken(
         dataSession: Pair<Instance, Application>,
-        code: String,
-        continuation: Continuation<Boolean>
-    ) {
-        GetOauthToken(
-            dataSession.second.clientId,
-            dataSession.second.clientSecret,
-            code,
-            GetOauthToken.GrantType.AUTHORIZATION_CODE
-        )
-            .setCallback(object : Callback<Token?> {
-                override fun onSuccess(token: Token?) {
-                    token?.let {
-                        handleGetAccount(dataSession = dataSession, token, continuation)
-                    } ?: continuation.resume(false)
-                }
+        code: String
+    ): Boolean {
+        return suspendCoroutine { continuation ->
+            GetOauthToken(
+                dataSession.second.clientId,
+                dataSession.second.clientSecret,
+                code,
+                GetOauthToken.GrantType.AUTHORIZATION_CODE
+            )
+                .setCallback(object : Callback<Token?> {
+                    override fun onSuccess(token: Token?) {
+                        token?.let {
+                            handleGetAccount(dataSession = dataSession, token, continuation)
+                        } ?: continuation.resume(false)
+                    }
 
-                override fun onError(error: ErrorResponse) {
-                    continuation.resumeWithException(NetworkErrorException())
-                }
-            })
-            .execNoAuth(dataSession.first.uri)
+                    override fun onError(error: ErrorResponse) {
+                        continuation.resumeWithException(NetworkErrorException())
+                    }
+                })
+                .execNoAuth(dataSession.first.uri)
+        }
     }
 
     private fun handleGetAccount(

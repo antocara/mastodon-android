@@ -1,6 +1,5 @@
-package org.joinmastodon.android
+package org.joinmastodon.android.features.oauth
 
-import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Intent
 import android.net.Uri
@@ -8,9 +7,12 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.launch
-import org.joinmastodon.android.data.oauth.OauthDataSource
+import org.joinmastodon.android.MainActivity
+import org.joinmastodon.android.R
 import org.joinmastodon.android.ui.utils.UiUtils
 import org.koin.android.ext.android.inject
 
@@ -22,52 +24,48 @@ class OAuthActivity : AppCompatActivity() {
         const val ERROR_DESCRIPTION = "error_description"
     }
 
-    private val oauthDataSource: OauthDataSource by inject()
+    private val oauthViewModel: OAuthViewModel by inject()
+
+    private val progress by lazy {
+        buildProgress()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         UiUtils.setUserPreferredTheme(this)
         super.onCreate(savedInstanceState)
-
-        val code = validateQueryParamsAndGetCode() ?: return
-
-        val progress = buildProgress()
-        progress.show()
-
-        handleGetOauthToken(code = code, progress = progress)
+        observeLoginState()
+        initLogin()
     }
 
-    private fun validateQueryParamsAndGetCode(): String? {
-
-        val uri = intent.data
-        if (uri == null || isTaskRoot) {
-            finish()
-            return null
-        }
-        uri.getQueryParameter(ERROR)?.let {
-            handleErrorQueryParams(uri)
-        }
-
-        val code = uri.getQueryParameter(CODE)
-        return if (code == null) {
-            finish()
-            null
-        } else {
-            code
-        }
-    }
-
-    private fun handleGetOauthToken(
-        code: String,
-        progress: ProgressDialog
-    ) {
-        lifecycleScope.launch {
-            if (oauthDataSource.getOauthToken(code)) {
-                progress.dismiss()
-                finish()
-                openMainActivity()
-            } else {
+    private fun initLogin() {
+        runCatching { oauthViewModel.validateQueryParamsAndGetCode(intent, isTaskRoot) }.fold(
+            {
+                progress.show()
+                oauthViewModel.handleLogin(it)
+            },
+            {
                 handleError()
-                progress.dismiss()
+                return
+            }
+        )
+    }
+
+    private fun observeLoginState() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                oauthViewModel.loginState.collect { state ->
+                    when (state) {
+                        is LoginState.Success -> {
+                            progress.dismiss()
+                            finish()
+                            openMainActivity()
+                        }
+                        is LoginState.Failure -> {
+                            handleError()
+                        }
+                        is LoginState.Loading -> progress.show()
+                    }
+                }
             }
         }
     }
@@ -79,6 +77,7 @@ class OAuthActivity : AppCompatActivity() {
         }
     }
 
+    //TODO create errors flows
     private fun handleErrorQueryParams(uri: Uri) {
         var error = uri.getQueryParameter(ERROR_DESCRIPTION)
         if (TextUtils.isEmpty(error)) {
@@ -94,6 +93,7 @@ class OAuthActivity : AppCompatActivity() {
     }
 
     private fun handleError() {
+        progress.dismiss()
         Toast.makeText(this, "Errorrrrrrrr", Toast.LENGTH_LONG).show()
         finish()
         restartMainActivity()
