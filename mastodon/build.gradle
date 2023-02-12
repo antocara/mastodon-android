@@ -63,7 +63,7 @@ android {
 
 dependencies {
     api 'androidx.annotation:annotation:1.3.0'
-    implementation 'com.squareup.okhttp3:okhttp:3.14.9'
+    //implementation 'com.squareup.okhttp3:okhttp:3.14.9'
     implementation 'com.google.code.gson:gson:2.8.9'
     implementation 'org.jsoup:jsoup:1.14.3'
     implementation 'com.squareup:otto:1.3.8'
@@ -114,6 +114,16 @@ dependencies {
         exclude group: 'androidx.collection', module: 'collection'
         exclude group: 'androidx.concurrent', module: 'concurrent-futures'
     }
+
+    //RETROFIT
+    def RETROFIT_VERSION = "2.9.0"
+    def OKHTTP_VERSION = "4.10.0"
+
+    implementation "com.squareup.retrofit2:retrofit:$RETROFIT_VERSION"
+    implementation "com.squareup.retrofit2:converter-gson:$RETROFIT_VERSION"
+    implementation "com.squareup.retrofit2:converter-scalars:$RETROFIT_VERSION"
+    implementation "com.squareup.okhttp3:okhttp:$OKHTTP_VERSION"
+    implementation "com.squareup.okhttp3:logging-interceptor:$OKHTTP_VERSION"
 
 
     annotationProcessor 'org.parceler:parceler:1.1.12'
