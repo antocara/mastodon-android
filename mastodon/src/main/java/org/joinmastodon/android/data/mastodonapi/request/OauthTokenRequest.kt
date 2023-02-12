@@ -5,19 +5,14 @@ import org.joinmastodon.android.api.session.AccountSessionManager
 import org.joinmastodon.android.data.mastodonapi.MastodonApi
 import org.joinmastodon.android.data.mastodonapi.MastodonEndpoints
 import org.joinmastodon.android.data.mastodonapi.extensions.asResult
+import org.joinmastodon.android.data.mastodonapi.request.MastodonRequest.Companion.HTTPS
 import org.joinmastodon.android.data.mastodonapi.response.OauthTokenResponse
 
-class OauthTokenRequest(apiClient: MastodonApi) :
-    MastodonRequest<OauthTokenBody, OauthTokenResponse>(apiClient) {
-
-    override suspend fun execute(domainUrl: String, body: OauthTokenBody): OauthTokenResponse? {
-        return runCatching {
-            apiClient.getOauthToken(buildUrl(domainUrl), body = body).asResult()
-        }.getOrNull()
-    }
-
-    override fun buildUrl(domainUrl: String): String {
-        return "$HTTPS$domainUrl${MastodonEndpoints.OAUTH_TOKEN.value}"
+class OauthTokenRequest() {
+    companion object {
+        fun url(domainUrl: String): String {
+            return "$HTTPS$domainUrl${MastodonEndpoints.OAUTH_TOKEN.value}"
+        }
     }
 }
 

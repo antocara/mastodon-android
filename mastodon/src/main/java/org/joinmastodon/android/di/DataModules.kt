@@ -18,16 +18,7 @@ val dataModules = module {
     single<GlobalUserPreferencesDataSource> { GlobalUserPreferences(androidContext()) }
 
     single<OauthDataSource> {
-        OauthRepository(AccountSessionManager.getInstance(), get())
+        OauthRepository(AccountSessionManager.getInstance(), get(named(MASTODON_API)))
     }
 
-    single<MastodonRequest<OauthTokenBody, OauthTokenResponse>> {
-        OauthTokenRequest(
-            get(
-                named(
-                    MASTODON_API
-                )
-            )
-        )
-    }
 }

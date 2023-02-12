@@ -26,12 +26,7 @@ data class OauthTokenResponse(
     var createdAt: Long = 0
 )
 
-fun a(){
-    val token = Token()
-    token.accessToken = ""
-}
-
-fun OauthTokenResponse.toOldToken() :Token {
+fun OauthTokenResponse.toOldToken(): Token {
     val token = Token()
     token.accessToken = this.accessToken
     token.tokenType = this.tokenType
