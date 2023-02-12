@@ -11,7 +11,7 @@ import org.joinmastodon.android.model.Token;
 public class GetOauthToken extends MastodonAPIRequest<Token>{
 	public GetOauthToken(String clientID, String clientSecret, String code, GrantType grantType){
 		super(HttpMethod.POST, "/oauth/token", Token.class);
-		setRequestBody(new OauthTokenRequest(clientID, clientSecret, code, grantType.getValue()));
+		//setRequestBody(new OauthTokenRequest(clientID, clientSecret, code, grantType.getValue()));
 	}
 
 	@Override

@@ -11,11 +11,14 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import me.grishka.appkit.api.Callback
 import me.grishka.appkit.api.ErrorResponse
+import org.joinmastodon.android.api.MastodonAPIRequest
 import org.joinmastodon.android.api.requests.accounts.GetOwnAccount
 import org.joinmastodon.android.api.requests.oauth.GetOauthToken
 import org.joinmastodon.android.api.session.AccountSessionManager
 import org.joinmastodon.android.data.mastodonapi.MastodonApi
 import org.joinmastodon.android.data.mastodonapi.MastodonEndpoints
+import org.joinmastodon.android.data.mastodonapi.request.MastodonRequest
+import org.joinmastodon.android.data.mastodonapi.request.OauthTokenBody
 import org.joinmastodon.android.data.mastodonapi.request.OauthTokenRequest
 import org.joinmastodon.android.data.mastodonapi.response.OauthTokenResponse
 import org.joinmastodon.android.data.mastodonapi.response.toOldToken
@@ -28,7 +31,7 @@ import retrofit2.Response
 
 class OauthRepository(
     private val accountSessionManager: AccountSessionManager,
-    val mastodonApi: MastodonApi
+    private val oauthTokenRequest: MastodonRequest<OauthTokenBody, OauthTokenResponse>
 ) : OauthDataSource {
 
     override suspend fun getOauthToken(code: String): Flow<Boolean> {
@@ -50,25 +53,18 @@ class OauthRepository(
         dataSession: Pair<Instance, Application>,
         code: String
     ): Boolean {
-        val body = OauthTokenRequest(
+        val body = OauthTokenBody(
             dataSession.second.clientId,
             dataSession.second.clientSecret,
             code,
             GrantType.AUTHORIZATION_CODE.value
         )
-        val url = "https://" + dataSession.first.uri + MastodonEndpoints.OAUTH_TOKEN.value
 
-        return runCatching {
-            val result = mastodonApi.getOauthToken(url, body)
-            if (result.isSuccessful) {
-                val token = result.body()!!.toOldToken()
-                return newHandleGetAccount(dataSession, token)
-            } else {
-                return false
-            }
-        }.getOrElse {
-            false
-        }
+       return oauthTokenRequest.execute(dataSession.first.uri, body)?.let {
+           newHandleGetAccount(dataSession, it.toOldToken())
+       } ?: false
+
+
     }
 
     private suspend fun handleGetToken(

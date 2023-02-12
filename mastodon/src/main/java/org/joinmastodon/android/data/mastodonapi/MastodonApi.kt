@@ -1,5 +1,6 @@
 package org.joinmastodon.android.data.mastodonapi
 
+import org.joinmastodon.android.data.mastodonapi.request.OauthTokenBody
 import org.joinmastodon.android.data.mastodonapi.request.OauthTokenRequest
 import org.joinmastodon.android.data.mastodonapi.response.OauthTokenResponse
 import retrofit2.Response
@@ -12,6 +13,6 @@ interface MastodonApi {
     @POST
     suspend fun getOauthToken(
         @Url url: String,
-        @Body body: OauthTokenRequest
+        @Body body: OauthTokenBody
     ): Response<OauthTokenResponse>
 }
