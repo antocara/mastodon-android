@@ -29,6 +29,7 @@ import org.joinmastodon.android.api.requests.oauth.CreateOAuthApp;
 import org.joinmastodon.android.api.requests.oauth.GetOauthToken;
 import org.joinmastodon.android.api.session.AccountActivationInfo;
 import org.joinmastodon.android.api.session.AccountSessionManager;
+import org.joinmastodon.android.data.oauth.model.GrantType;
 import org.joinmastodon.android.model.Account;
 import org.joinmastodon.android.model.Application;
 import org.joinmastodon.android.model.Instance;
@@ -343,7 +344,7 @@ public class SignupFragment extends ToolbarFragment{
 	}
 
 	private void getToken(){
-		currentBackgroundRequest=new GetOauthToken(apiApplication.clientId, apiApplication.clientSecret, null, GetOauthToken.GrantType.CLIENT_CREDENTIALS)
+		currentBackgroundRequest=new GetOauthToken(apiApplication.clientId, apiApplication.clientSecret, null, GrantType.CLIENT_CREDENTIALS)
 				.setCallback(new Callback<>(){
 					@Override
 					public void onSuccess(Token result){
