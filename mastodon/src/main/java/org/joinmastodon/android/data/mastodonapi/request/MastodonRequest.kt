@@ -11,6 +11,7 @@ open class MastodonRequest<T>(val apiCallAction: ApiCall<T>) {
 
     companion object {
         const val HTTPS = "https://"
+        const val JOIN_MASTODON_DOMAIN = "api.joinmastodon.org"
     }
 
     suspend fun execute(): T? {
