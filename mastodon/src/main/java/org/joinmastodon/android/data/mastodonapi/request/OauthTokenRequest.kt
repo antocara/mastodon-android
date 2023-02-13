@@ -7,11 +7,27 @@ import org.joinmastodon.android.data.mastodonapi.MastodonEndpoints
 import org.joinmastodon.android.data.mastodonapi.extensions.asResult
 import org.joinmastodon.android.data.mastodonapi.request.MastodonRequest.Companion.HTTPS
 import org.joinmastodon.android.data.mastodonapi.response.OauthTokenResponse
+import org.joinmastodon.android.data.oauth.model.GrantType
+import org.joinmastodon.android.model.Application
+import org.joinmastodon.android.model.Instance
 
-class OauthTokenRequest() {
-    companion object {
-        fun url(domainUrl: String): String {
-            return "$HTTPS$domainUrl${MastodonEndpoints.OAUTH_TOKEN.value}"
+class OauthTokenRequest(private val mastodonApi: MastodonApi) {
+
+    private fun buildUrl(domain: String) = "$HTTPS$domain${MastodonEndpoints.OAUTH_TOKEN.value}"
+
+    suspend fun getToken(
+        application: Application,
+        instance: Instance,
+        code: String
+    ): MastodonRequest<OauthTokenResponse> {
+        val body = OauthTokenBody(
+            application.clientId,
+            application.clientSecret,
+            code,
+            GrantType.AUTHORIZATION_CODE.value
+        )
+        return MastodonRequest {
+            mastodonApi.getOauthToken(buildUrl(instance.uri), body)
         }
     }
 }

@@ -35,7 +35,8 @@ import retrofit2.Response
 
 class OauthRepository(
     private val accountSessionManager: AccountSessionManager,
-    private val apiClient: MastodonApi
+    private val oauthTokenRequest: OauthTokenRequest,
+    private val ownAccountRequest: OwnAccountRequest,
 ) : OauthDataSource {
 
     override suspend fun getOauthToken(code: String): Flow<Boolean> {
@@ -63,16 +64,9 @@ class OauthRepository(
         dataSession: Pair<Instance, Application>,
         code: String
     ): OauthTokenResponse? {
-        val body = OauthTokenBody(
-            dataSession.second.clientId,
-            dataSession.second.clientSecret,
-            code,
-            GrantType.AUTHORIZATION_CODE.value
-        )
 
         return runCatching {
-            apiClient.getOauthToken(OauthTokenRequest.url(dataSession.first.uri), body = body)
-                .asResult()
+            oauthTokenRequest.getToken(dataSession.second, dataSession.first, code).execute()
         }.getOrNull()
     }
 
@@ -81,17 +75,15 @@ class OauthRepository(
         token: Token
     ): Boolean {
 
-        val result = runCatching {
-            apiClient.getOwnAccount(
-                OwnAccountRequest.buildBearerHeader(token),
-                OwnAccountRequest.url(dataSession.first.uri)
-            ).asResult()
-        }.getOrNull()
+        val account = runCatching {
+            ownAccountRequest.getAccount(token = token, instance = dataSession.first).execute()
+        }.getOrNull().also {
+            it?.run {
+                addAccountData(dataSession, token, this.toOld())
+            }
+        }
 
-        return result?.let {
-            addAccountData(dataSession, token, it.toOld())
-            return@let true
-        } ?: false
+        return account != null
     }
 
     private fun addAccountData(
